@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="md_white_1000">@android:color/white</color>
+    <color name="md_green_100">#A2E8A3</color>
+    <color name="md_green_600">#0C900A</color>
+    <color name="md_green_800">#056F00</color>
+
+    <color name="primary">#EF5350</color>
+    <color name="secondary">#B71C1C</color>
+    <color name="overlay_light">#F8F8F8</color>
+</resources>

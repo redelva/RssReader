@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/processContainer"
+    android:orientation="vertical"
+    android:layout_width="90dp"
+    android:layout_height="90dp"
+    android:visibility="gone"
+    android:layout_gravity="center_vertical"
+    android:layout_centerVertical="true"
+    android:layout_centerHorizontal="true"
+    android:background="@drawable/spinner_inner"
+    android:scaleType="centerInside">
+
+    <ImageView
+        android:id="@+id/process"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription=""
+        android:src="@drawable/spinner_outer" />
+
+    <TextView
+        android:textSize="16.0sp"
+        android:gravity="center_vertical" android:id="@+id/blog_content_msg"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_marginLeft="5.0dip" android:layout_marginTop="10.0dip"/>
+
+</LinearLayout>

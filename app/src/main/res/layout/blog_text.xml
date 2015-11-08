@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    card_view:cardCornerRadius="0dp">
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:focusable="false"
+        android:descendantFocusability="blocksDescendants"
+        android:background="?android:attr/selectableItemBackground"
+        android:id="@+id/front"
+        android:tag="front"
+        android:layout_marginTop="2dip"
+        android:layout_marginBottom="4dip"
+        android:layout_marginLeft="8dip"
+        android:layout_marginRight="8dip"
+        android:gravity="left|center_vertical"
+        android:orientation="horizontal"
+        android:layout_gravity=""
+        android:layout_height="fill_parent">
+
+        <TextView
+            android:textSize="12sp"
+            android:singleLine="true"
+            android:textStyle="bold"
+            android:id="@+id/blog_subtitle"
+            tools:text="cnBeta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/blog_avatar"
+            android:scaleType="fitXY"
+            tools:src="@drawable/ic_drawer"
+            android:layout_below="@id/blog_subtitle"
+            android:layout_width="64dip"
+            android:layout_height="64dip"/>
+
+        <TextView
+            android:textSize="12sp"
+            android:id="@+id/blog_date"
+            tools:text="2015-9-15"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:id="@+id/blog_read"
+            android:layout_width="15dip"
+            android:layout_height="15dip"
+            android:layout_toLeftOf="@+id/blog_date"
+            android:layout_marginRight="4sp"/>
+
+        <ImageView
+            android:id="@+id/blog_star"
+            android:layout_marginRight="4sp"
+            android:layout_width="15dip"
+            android:layout_toLeftOf="@+id/blog_read"
+            android:layout_height="15dip"/>
+
+        <TextView android:textSize="20sp"
+            android:id="@+id/blog_title"
+            tools:text="360酷派疑似和解:酷派副董事长蒋超现身360总部"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_centerInParent="true"
+            android:layout_toRightOf="@id/blog_avatar"
+            android:layout_below="@id/blog_subtitle"
+            android:maxLines="3" />
+    </RelativeLayout>
+
+
+
+</android.support.v7.widget.CardView>

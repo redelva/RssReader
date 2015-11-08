@@ -1,0 +1,51 @@
+<resources>
+    <string name="app_name">Rss Reader</string>
+
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_example">Example action</string>
+    <string name="action_sync">Sync</string>
+    <string name="action_search">Search</string>
+    <string name="action_share">Share</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="blog_videooptimize">Video not optimize for mobile device</string>
+    <string name="blog_clicktoview">点击观看</string>
+
+    <string name="content_errortitle">非常抱歉</string>
+    <string name="content_errorcontent">无法获取信息或者错误发生了</string>
+    <string name="content_errorload">请点击屏幕重新加载</string>
+    <string name="content_savetolibrary">Saved to library</string>
+    <string name="content_loading">Loading</string>
+
+    <string name="login_title">登录</string>
+    <string name="login_msg">正在加载登陆页面</string>
+    <string name="login_authing">正在授权中</string>
+
+    <string name="list_empty_view">暂无数据\n下拉重试</string>
+
+    <string name="no_data">No data available</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="title_activity_search">SearchActivity</string>
+</resources>

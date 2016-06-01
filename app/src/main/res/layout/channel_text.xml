@@ -7,14 +7,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="1dp"
+    card_view:cardBackgroundColor = "?attr/backgroundColor"
     card_view:cardCornerRadius="0dp">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="?android:attr/selectableItemBackground"
-        >
+        android:id="@+id/container">
+
         <ImageView
             android:id="@+id/channel_icon"
             android:layout_width="50dip"
@@ -22,6 +23,7 @@
             android:gravity="center"
             android:padding="2dip"
             android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:src="@mipmap/rss"
             android:contentDescription="" />
 
@@ -38,6 +40,7 @@
             android:singleLine="true"
             android:gravity="center"
             android:textSize="20sp"
+            android:textColor="?attr/textColor"
             tools:text="36" />
 
         <TextView
@@ -48,6 +51,7 @@
             android:singleLine="true"
             android:textSize="20sp"
             tools:text="36KR|关注换联网创业的历史"
+            android:textColor="?attr/textColor"
             android:layout_centerInParent="true"
             android:layout_toRightOf="@id/channel_icon"
             android:layout_toLeftOf="@id/channel_count"

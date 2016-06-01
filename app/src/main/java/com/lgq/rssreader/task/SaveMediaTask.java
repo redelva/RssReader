@@ -2,13 +2,18 @@ package com.lgq.rssreader.task;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.widget.Toast;
 
 import com.lgq.rssreader.R;
+import com.lgq.rssreader.util.ImageUtil;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -44,8 +49,22 @@ public class SaveMediaTask extends AsyncTask<String, Void, Void> {
             BufferedInputStream bis = new BufferedInputStream(is);
             Bitmap bm = BitmapFactory.decodeStream(bis);
 
-            ContentResolver cr = mContext.get().getContentResolver();
-            MediaStore.Images.Media.insertImage(cr, bm, "RssReader", "this is a Photo from RssReader");
+            ImageUtil.saveImage(mContext.get(), bm);
+
+//            ContentResolver cr = mContext.get().getContentResolver();
+//            String path = MediaStore.Images.Media.insertImage(cr, bm, "RssReader", "this is a Photo from RssReader");
+//
+//            MediaScannerConnection.scanFile(mContext.get(), new String[] {
+//                    Environment.getExternalStorageDirectory().getAbsolutePath()
+//            }, null, new MediaScannerConnection.OnScanCompletedListener() {
+//
+//                @Override
+//                public void onScanCompleted(String path, Uri uri) {
+//                    // TODO Auto-generated method stub
+//
+//                }
+//            });
+
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -60,5 +79,8 @@ public class SaveMediaTask extends AsyncTask<String, Void, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         Toast.makeText(mContext.get(), mContext.get().getResources().getString(R.string.content_savetolibrary), Toast.LENGTH_SHORT).show();
+
+        //if(mContext.get() != null)
+        //    mContext.get().sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://"+ Environment.getExternalStorageDirectory())));;
     }
 }

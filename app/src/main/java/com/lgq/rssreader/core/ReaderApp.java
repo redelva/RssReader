@@ -8,10 +8,12 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import com.lgq.rssreader.MainActivity;
+import com.lgq.rssreader.R;
+import com.nostra13.universalimageloader.cache.memory.impl.LruMemoryCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.squareup.leakcanary.LeakCanary;
-import com.squareup.leakcanary.RefWatcher;
+//import com.squareup.leakcanary.LeakCanary;
+//import com.squareup.leakcanary.RefWatcher;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,18 +29,24 @@ public class ReaderApp extends com.orm.SugarApp {
         return ReaderApp.getSugarContext();
     }
 
-    public static RefWatcher getRefWatcher(Context context) {
-        ReaderApp application = (ReaderApp) context.getApplicationContext();
-        return application.refWatcher;
-    }
+//    public static RefWatcher getRefWatcher(Context context) {
+//        ReaderApp application = (ReaderApp) context.getApplicationContext();
+//        return application.refWatcher;
+//    }
 
-    private RefWatcher refWatcher;
+    //private RefWatcher refWatcher;
 
     @Override public void onCreate() {
+        //this.setTheme(R.style.WhiteTheme);
+
         super.onCreate();
-        refWatcher = LeakCanary.install(this);
+        this.getTheme().applyStyle(R.style.WhiteTheme, true);
+
+        //refWatcher = LeakCanary.install(this);
         //创建默认的ImageLoader配置参数
         ImageLoaderConfiguration configuration = new ImageLoaderConfiguration.Builder(this)
+                .diskCacheFileCount(1500)
+                .memoryCache(new LruMemoryCache(20 * 1024 * 1024))
                 .taskExecutor(Executors.newCachedThreadPool())
                 .taskExecutorForCachedImages(Executors.newCachedThreadPool())
                 .build();

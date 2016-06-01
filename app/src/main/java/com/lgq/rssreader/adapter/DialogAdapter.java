@@ -9,11 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lgq.rssreader.R;
-import com.lgq.rssreader.model.Channel;
 
-/**
- * @author alessandro.balocco
- */
 public class DialogAdapter extends BaseAdapter {
 
     private LayoutInflater layoutInflater;

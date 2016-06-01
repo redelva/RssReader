@@ -52,7 +52,7 @@ public class LoginActivity extends FragmentActivity {
         if(PreferencesUtil.getAccessToken().length() > 0){
             Intent i = new Intent(this,MainActivity.class);
             startActivity(i);
-
+            LoginActivity.this.finish();
             return false;
         }
 

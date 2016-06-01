@@ -12,9 +12,11 @@ import org.jsoup.select.Elements;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Created by redel on 2015-10-17.
@@ -49,6 +51,10 @@ public class ContentFormatter extends BlogFormatter {
     protected String Download(final Blog blog) {
         if (blog.getContent() == null || blog.getContent().length() == 0 || blog.getContent().contains("embed")) {
             String content = downloadGbUrl(blog.getLink(), "utf-8");
+
+            if(content.length() == 0){
+                return "";
+            }
 
             int index = content.indexOf("body");
 
@@ -86,9 +92,19 @@ public class ContentFormatter extends BlogFormatter {
         try{
             URL u = new URL(url);
             URLConnection conn = u.openConnection();
+            conn.setRequestProperty("Accept-Encoding", "gzip");
             //建立连接
             conn.connect();
-            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), coding));
+
+            Reader reader = null;
+            if ("gzip".equals(conn.getContentEncoding())) {
+                reader = new InputStreamReader(new GZIPInputStream(conn.getInputStream()));
+            }
+            else {
+                reader = new InputStreamReader(conn.getInputStream(), coding);
+            }
+
+            BufferedReader br = new BufferedReader(reader);
             String buf = "";
             StringBuilder content = new StringBuilder();
             while((buf = br.readLine()) != null)

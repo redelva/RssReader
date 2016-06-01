@@ -26,4 +26,26 @@ public class UrlUtil {
 
         return value;
     }
+
+    public static String findValueInConetent(String content, String spliter, String splitValue, String key){
+        String[] params = content.split(spliter);
+
+        String value = "";
+
+        for(String p : params){
+            if(p.contains(key)){
+                try {
+                    String[] parts = p.split(splitValue);
+                    value = parts[parts.length - 1].replace("'","").replace(" ","");
+                    if(value.startsWith("//"))
+                        value = "http:" + value;
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return value;
+    }
 }

@@ -4,8 +4,13 @@
     android:id="@+id/activity_toolbar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:background="@color/md_green_600"
-    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+    android:background="?attr/colorPrimary"
+
     tools:showIn="@layout/activity_main"
     tools:toolBarNavMode="tabs"
-    app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+    />
+
+    <!--app:popupTheme="@style/ThemeOverlay.AppCompat.Light"-->
+    <!--android:theme="@style/ThemeOverlay.AppCompat.Dark"-->
+
+    <!--android:background="@color/md_green_600"-->

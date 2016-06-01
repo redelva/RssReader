@@ -5,7 +5,7 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 
 import com.lgq.rssreader.core.ReaderApp;
-import com.squareup.leakcanary.RefWatcher;
+//ximport com.squareup.leakcanary.RefWatcher;
 
 /**
  * Created by redel on 2015-10-09.
@@ -14,9 +14,9 @@ public abstract class BaseFragment extends Fragment {
 
     @Override public void onDestroy() {
         super.onDestroy();
-        RefWatcher refWatcher = ReaderApp.getRefWatcher(getActivity());
-        refWatcher.watch(this);
-        //mCallback = null;
+        //RefWatcher refWatcher = ReaderApp.getRefWatcher(getActivity());
+        //refWatcher.watch(this);
+
     }
 
     public String getToken(){

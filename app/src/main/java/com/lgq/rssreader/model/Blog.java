@@ -10,19 +10,29 @@ public class Blog extends SugarRecord<Blog> implements Serializable,Comparable<B
 
     private static final long serialVersionUID = 373299365769337131L;
 
-   private String blogId;
-   private String tagId;
-   private String channelId;
-   private String title;
-   private String description;
-   private String link;
-   private Date pubDate;
-   private String subsTitle;
-   private long timeStamp;
-   private boolean isRead;
-   private boolean isStarred;
-   private String originId;
-   private boolean isRecommend;
+    private String blogId;
+    private String tagId;
+    private String channelId;
+    private String title;
+    private String description;
+    private String link;
+    private Date pubDate;
+    private String subsTitle;
+    private long timeStamp;
+    private boolean isRead;
+    private boolean isStarred;
+    private String originId;
+    private boolean isRecommend;
+
+    public long getActionTime() {
+        return actionTime;
+    }
+
+    public void setActionTime(long actionTime) {
+        this.actionTime = actionTime;
+    }
+
+    private long actionTime;
 
     public void setBlogId(String blogId) {
         this.blogId = blogId;

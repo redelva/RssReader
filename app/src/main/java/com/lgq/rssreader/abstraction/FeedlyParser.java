@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Looper;
 import android.support.v4.util.Pair;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.lgq.rssreader.core.ReaderApp;
@@ -20,10 +21,12 @@ import com.lgq.rssreader.model.Tag;
 import com.lgq.rssreader.model.Unread;
 import com.lgq.rssreader.model.UnreadCount;
 
+import org.apache.http.entity.StringEntity;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -129,6 +132,7 @@ public class FeedlyParser implements RssParser {
                 c.setSortId(s.getSortId());
                 c.setIsDirectory(false);
                 c.setChildren(new ArrayList<Channel>());
+                c.setHasParent(false);
 
                 UnreadCount uc = null;
                 for (UnreadCount count:  unread.getUnreads()) {
@@ -146,11 +150,9 @@ public class FeedlyParser implements RssParser {
                     c.setUnreadCount(0);
                 }
 
-                if (s.getCategories().size() != 0)
-                {
+                if (s.getCategories().size() != 0) {
                     c.setIsDirectory(false);
-                    for(Tag t : s.getCategories())
-                    {
+                    for(Tag t : s.getCategories()) {
                         Channel d = null;
                         for (Channel child:  obj) {
                             if(child.getChannelId().equals(t.getId())) {
@@ -158,8 +160,9 @@ public class FeedlyParser implements RssParser {
                                 break;
                             }
                         }
-                        if (d != null)
-                        {
+                        if (d != null) {
+                            c.setTagId(d.getChannelId());
+                            c.setHasParent(true);
                             d.getChildren().add(c);
                         }
                     }
@@ -402,9 +405,9 @@ public class FeedlyParser implements RssParser {
             results.addAll(from);
         }
 
-        if(to != null){
-            results.addAll(to);
-        }
+//        if(to != null){
+//            results.addAll(to);
+//        }
 
         return results;
     }
@@ -584,8 +587,13 @@ public class FeedlyParser implements RssParser {
             url = "http://cloud.feedly.com/v3/tags/user%2F" + userId + "%2Ftag%2Fglobal.saved?ct=feedly.desktop";
             method = "PUT";
 
-            actionParams = "{\"entryId\":" + blog.getBlogId() + "}";
+            actionParams = "{\"entryId\":\"" + blog.getBlogId() + "\"}";
             //params.put("entryId", sb.toString());
+        } else if (action == RssAction.AsUnstar) {
+            url = "http://cloud.feedly.com/v3/tags/user%2F" + userId + "%2Ftag%2Fglobal.saved/" + blog.getBlogId() + "?ct=feedly.desktop";
+            method = "DELETE";
+
+            actionParams = "{\"entryId\":" + blog.getBlogId() + "}";
         } else if (action == RssAction.AsRead) {
 
             actionParams = "{\"action\":\"markAsRead\",\"type\":\"entries\",\"entryIds\":[\"" + blog.getBlogId() + "\"]}";
@@ -605,12 +613,14 @@ public class FeedlyParser implements RssParser {
 
         url = url + "&ck=" + System.currentTimeMillis();
 
-        boolean result;
+        boolean result = false;
 
-        if(actionParams.length() == 0) {
+        if(method.equals("DELETE")) {
             result = RssHttpClient.delete(url);
-        }else {
+        }else if(method.equals("POST")){
             result = RssHttpClient.post(url, actionParams);
+        }else if(method.equals("PUT")){
+            result = RssHttpClient.put(url, actionParams);
         }
 
         Log.i("RssReader", "mark" + blog.getTitle() + " as " + action + " reulst is " + result);
@@ -618,8 +628,79 @@ public class FeedlyParser implements RssParser {
         return result;
     }
 
-    public boolean markTag(Channel displayObj, RssAction action){
-        return false;
+    public boolean markTag(String userId, Channel channel, RssAction action){
+        String actionParams = "";
+        String url = "";
+        String method = "";
+
+        if (action == RssAction.UnSubscribe)
+        {
+            url = "https://cloud.feedly.com/v3/subscriptions/" + Uri.encode(channel.getChannelId(),"UTF-8") + "?ck=" + System.currentTimeMillis() + "&ct=feedly.desktop&cv=17.1.614";
+            actionParams = "";
+            method = "DELETE";
+        }
+
+        if (action == RssAction.RemoveTag)
+        {
+            //http://cloud.feedly.com/v3/subscriptions/feed%2Fhttp%3A%2F%2Ffeeds2.feedburner.com%2Fcnbeta-full?ck=1371959857730&ct=feedly.desktop
+            //DELETE
+            url = "https://cloud.feedly.com/v3/subscriptions/" + Uri.encode(channel.getChannelId(),"UTF-8") + "?ck="+ System.currentTimeMillis() +"&ct=feedly.desktop";
+            actionParams = "";
+            method = "DELETE";
+        }
+
+        if (action == RssAction.MoveTag)
+        {
+            //{"id":"feed/http://feeds2.feedburner.com/cnbeta-full","title":"cnBetaå…¨æ–‡ç‰ˆ","categories":[{"id":"user/d1ef3938-a54b-4404-9d9d-f97842124281/category/test","label":"test"}]}:
+            //{"id":"feed/http://www.cnbeta.com/backend.php","title":"cnBeta.COM","categories":[{"id":"user/d1ef3938-a54b-4404-9d9d-f97842124281/category/Test","label":"Test"}]}
+            String newTitle = String.valueOf(channel.getTag());
+            if(newTitle.equals("Root"))
+                actionParams = "{\"id\":\"" + TextUtils.htmlEncode(channel.getChannelId()) + "\",\"title\":\"" + TextUtils.htmlEncode(channel.getTitle()) + "\",\"categories\":[]}";
+            else
+                actionParams = "{\"id\":\"" + TextUtils.htmlEncode(channel.getChannelId()) + "\",\"title\":\"" + TextUtils.htmlEncode(channel.getTitle()) + "\",\"categories\":[{\"id\":\"user/" + userId + "/category/" + newTitle + "\",\"label\":\"" + newTitle + "\"}]}";
+            url = "http://cloud.feedly.com/v3/subscriptions?ct=feedly.desktop";
+            method = "POST";
+        }
+
+        if (action == RssAction.Rename)
+        {
+            String newTitle = String.valueOf(channel.getTag());
+            actionParams = "{\"id\":\"" + channel.getChannelId() + "\",\"title\":\"" + newTitle + "\",\"categories\":[]}";
+            url = "http://cloud.feedly.com/v3/subscriptions?ct=feedly.desktop";
+            method = "POST";
+        }
+
+        if (action == RssAction.AllAsRead)
+        {
+            if(channel.getIsDirectory())
+            {
+                //{"action":"markAsRead","type":"categories","categoryIds":["user/d1ef3938-a54b-4404-9d9d-f97842124281/category/æŒ‡å¯¼"],"asOf":1371898725006}
+                actionParams = "{\"action\":\"markAsRead\",\"type\":\"categories\",\"categoryIds\":[\"user/" +userId + "/category/" + TextUtils.htmlEncode(channel.getTitle()) + "\"],\"asOf\":" + System.currentTimeMillis() + "}";
+                url = "http://cloud.feedly.com/v3/markers?ct=feedly.desktop";
+            }
+            else
+            {
+                //{"action":"markAsRead","type":"feeds","feedIds":["feed/http://www.wpdang.com/feed"],"asOf":1371917583346}
+                actionParams = "{\"action\":\"markAsRead\",\"type\":\"feeds\",\"feedIds\":[\"" + channel.getChannelId() +"\"],\"asOf\":" + System.currentTimeMillis() + "}";
+                url = "http://cloud.feedly.com/v3/markers?ct=feedly.desktop";
+            }
+            method = "POST";
+        }
+
+        url = url + "&ck=" + System.currentTimeMillis();
+
+        boolean result = false;
+        if(method.equals("DELETE"))
+        {
+            result = RssHttpClient.delete(url);
+        }
+
+        if(method.equals("POST"))
+        {
+            result = RssHttpClient.post(url, actionParams);
+        }
+
+        return result;
     }
 
     public List<Blog> getRssBlog(final Channel channel, final Blog blog, final int count) {
@@ -649,7 +730,9 @@ public class FeedlyParser implements RssParser {
 
     private Pair<List<Blog>, Boolean> getRssBlog(final HashMap<String, String> containers, final Channel channel, final Blog blog, final int count){
         String url = "";
-        if(channel.getChannelId().length() > 0)
+        if(channel.getChannelId().equals("unread"))
+            url = "https://cloud.feedly.com/v3/streams/contents?streamId=" + Uri.encode(channel.getChannelId()+ "&unreadOnly=true", "UTF-8");
+        else if(channel.getChannelId().length() > 0)
             url = "https://cloud.feedly.com/v3/streams/contents?streamId=" + Uri.encode(channel.getChannelId(), "UTF-8");
         else
             url = "https://cloud.feedly.com/v3/streams/contents?streamId=" + Uri.encode("user/d1ef3938-a54b-4404-9d9d-f97842124281/category/global.all", "UTF-8");
@@ -698,7 +781,7 @@ public class FeedlyParser implements RssParser {
                 containers.put("UP" + channel.getChannelId(), continuation);
             } else if (blog.getTimeStamp() <= 0) {
                 //get older
-                saver.edit().putString("DOWN" + channel.getChannelId(), continuation);
+                saver.edit().putString("DOWN" + channel.getChannelId(), continuation).commit();
             }
 
             List<Blog> blogs = new ArrayList<Blog>();
@@ -764,6 +847,9 @@ public class FeedlyParser implements RssParser {
                 b.setIsRead(item.has("unread") ? !item.getBoolean("unread") : false);
                 if(item.has("visual") && item.getJSONObject("visual").has("url")){
                     b.setAvatar(item.getJSONObject("visual").has("url") ? item.getJSONObject("visual").getString("url") : "");
+                    if (b.getAvatar().contains("dgtle.com")) {
+                        b.setAvatar(b.getAvatar().replace("!600px",""));
+                    }
                 }
 
                 if (item.has("tags")) {
@@ -773,6 +859,10 @@ public class FeedlyParser implements RssParser {
                         if (tags.getString(j).contains("saved"))
                             b.setIsStarred(true);
                     }
+                }
+
+                if(item.has("actionTimestamp")){
+                    b.setActionTime(item.getLong("actionTimestamp"));
                 }
 
                 b.setOriginId(item.getString("id"));
@@ -812,7 +902,18 @@ public class FeedlyParser implements RssParser {
     }
 
     public boolean addRss(String rssUrl, String searchResultTitle){
-        return false;
+        String actionParams = "";
+
+        actionParams = "{\"id\":\"" + rssUrl + "\"," +
+                "\"title\":\"" + searchResultTitle + "\"," +
+                "\"categories\":[]," +
+                "\"via\":\"" + rssUrl + "\"," +
+                "\"viaType\":\"direct\"," +
+                "\"viaPage\":\"subscription/" + rssUrl + "\"}";
+
+        String url = "http://feedly.com/v3/subscriptions?ck=" + System.currentTimeMillis() + "&ct=feedly.desktop&cv=16.0.548";
+
+        return RssHttpClient.post(url, actionParams);
     }
 
     public boolean assignFolder(Channel folder, Channel single){
@@ -820,7 +921,32 @@ public class FeedlyParser implements RssParser {
     }
 
     public List<Result> searchRss(String key, int page){
-        return null;
+        String url = "http://www.feedly.com/v3/search/feeds?q=" + Uri.encode(key, "UTF-8") + "&n=20&d=true&ck=" + System.currentTimeMillis();
+
+        String content = RssHttpClient.get(url);
+
+        List<Result> results = new ArrayList<Result>();
+
+        try{
+            JSONObject obj = new JSONObject(content);
+            JSONObject r = null;
+            int len = obj.getJSONArray("results").length();
+            for(int i=0; i<len;i++){
+                r = obj.getJSONArray("results").getJSONObject(i);
+                Result result = new Result();
+
+                result.setSubscribed(false);
+                result.setTitle(r.getString("title"));
+                result.setFeedId(r.getString("feedId"));
+                result.setSubscriptCount(r.getString("subscribers"));
+                result.setDescription(r.getString("description"));
+                results.add(result);
+            }
+        }catch(JSONException je){
+            je.printStackTrace();
+        }
+
+        return results;
     }
 
     public void download(Channel c, int count, RssCallback<List<Blog>> handler){

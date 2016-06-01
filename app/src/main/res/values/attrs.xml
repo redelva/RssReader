@@ -1,0 +1,21 @@
+<resources>
+
+    <!-- Declare custom theme attributes that allow changing which styles are
+         used for button bars depending on the API level.
+         ?android:attr/buttonBarStyle is new as of API 11 so this is
+         necessary to support previous API levels. -->
+    <declare-styleable name="ButtonBarContainerTheme">
+        <attr name="metaButtonBarStyle" format="reference" />
+        <attr name="metaButtonBarButtonStyle" format="reference" />
+
+        <attr name="themedActionbarBackgroundColor" format="reference" />
+        <attr name="backgroundColor" format="reference" />
+        <attr name="tabBackgroundColor" format="reference" />
+        <attr name="webBackgroundColor" format="reference" />
+        <attr name="indicatorColor" format="reference" />
+        <attr name="selectedTextColor" format="reference" />
+        <attr name="readTextColor" format="reference" />
+        <attr name="textColor" format="reference" />
+    </declare-styleable>
+
+</resources>

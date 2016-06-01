@@ -11,9 +11,10 @@
         <item name="searchViewStyle">@style/MySearchViewStyle</item>
     </style>
 
-    <style name="MySearchViewStyle" parent="Widget.AppCompat.SearchView" >
+    <style name="MySearchViewStyle" parent="Widget.AppCompat.SearchView">
 
     </style>
+
     <style name="AppTheme" parent="@style/AppBaseTheme" />
 
     <style name="MenuButtonsStyle">
@@ -25,4 +26,121 @@
         <item name="fab_colorPressed">#2E7D32</item>
         <item name="fab_colorRipple">#1B5E20</item>
     </style>
+
+    <style name="FullscreenTheme" parent="AppTheme">
+        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
+        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
+    </style>
+
+    <style name="FullscreenActionBarStyle" parent="android:Widget.Holo.ActionBar">
+        <item name="android:background">@color/black_overlay</item>
+    </style>
+
+    <style name="WhiteTheme" parent="AppBaseTheme">
+        <item name="fab_size">mini</item>
+        <item name="fab_showAnimation">@anim/jump_from_down</item>
+        <item name="fab_hideAnimation">@anim/jump_to_down</item>
+        <item name="fab_shadowColor">#444</item>
+        <item name="fab_colorNormal">#43A047</item>
+        <item name="fab_colorPressed">#2E7D32</item>
+        <item name="fab_colorRipple">#1B5E20</item>
+
+        <item name="backgroundColor">@color/white</item>
+        <item name="tabBackgroundColor">@color/md_green_600</item>
+        <item name="webBackgroundColor">@color/white</item>
+        <item name="tabTextColor">@color/md_green_100</item>
+        <item name="indicatorColor">@color/md_green_800</item>
+        <item name="selectedTextColor">@color/md_white_1000</item>
+        <item name="readTextColor">@color/gray</item>
+        <item name="textColor">@android:color/black</item>
+
+        <item name="actionMenuTextColor">@android:color/black</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/white</item>
+
+        <!-- Toolbar（actionbar）颜色 -->
+        <item name="colorPrimary">@color/md_green_600</item>
+        <!-- 状态栏颜色 -->
+        <item name="colorPrimaryDark">@color/md_green_800</item>
+        <!-- 窗口的背景颜色 -->
+        <item name="android:windowBackground">@android:color/white</item>
+        <!-- SearchView -->
+        <item name="searchViewStyle">@style/MySearchViewStyle</item>
+    </style>
+
+    <style name="BlackTheme" parent="AppBaseTheme">
+        <item name="fab_size">mini</item>
+        <item name="fab_showAnimation">@anim/jump_from_down</item>
+        <item name="fab_hideAnimation">@anim/jump_to_down</item>
+        <item name="fab_shadowColor">#444</item>
+        <item name="fab_colorNormal">#43A047</item>
+        <item name="fab_colorPressed">#2E7D32</item>
+        <item name="fab_colorRipple">#1B5E20</item>
+
+        <!-- Toolbar（actionbar）颜色 -->
+        <item name="colorPrimary">@color/md_green_600</item>
+        <!-- 状态栏颜色 -->
+        <item name="colorPrimaryDark">@color/md_green_800</item>
+        <!-- 窗口的背景颜色 -->
+        <item name="android:windowBackground">@android:color/black</item>
+        <!-- SearchView -->
+        <item name="searchViewStyle">@style/MySearchViewStyle</item>
+    </style>
+
+    <style name="DarkTheme" parent="AppBaseTheme">
+        <item name="fab_size">mini</item>
+        <item name="fab_showAnimation">@anim/jump_from_down</item>
+        <item name="fab_hideAnimation">@anim/jump_to_down</item>
+        <item name="fab_shadowColor">#444</item>
+        <item name="fab_colorNormal">#37474F</item>
+        <item name="fab_colorPressed">#2E282D</item>
+        <item name="fab_colorRipple">#1E282D</item>
+
+        <item name="backgroundColor">@color/dark_backgroud_color</item>
+        <item name="tabBackgroundColor">@color/dark_backgroud_color</item>
+        <item name="webBackgroundColor">@color/dark_indicator_color</item>
+        <item name="tabTextColor">@color/dark_selectedText_color</item>
+        <item name="indicatorColor">@color/dark_indicator_color</item>
+        <item name="selectedTextColor">@color/dark_selectedText_color</item>
+        <item name="readTextColor">@color/dark_selectedText_color</item>
+        <item name="textColor">@color/dark_text_color</item>
+
+        <item name="actionMenuTextColor">@color/dark_text_color</item>
+        <item name="android:textColorPrimary">@color/dark_text_color</item>
+        <item name="android:textColorSecondary">@color/dark_text_color</item>
+
+        <!-- Toolbar（actionbar）颜色 -->
+        <item name="colorPrimary">#37474F</item>
+        <!-- 状态栏颜色 -->
+        <item name="colorPrimaryDark">#1E282D</item>
+        <!-- 窗口的背景颜色 -->
+        <item name="android:windowBackground">@color/dark_backgroud_color</item>
+        <!-- SearchView -->
+        <item name="searchViewStyle">@style/MySearchViewStyle</item>
+
+    </style>
+
+    <style name="GrayTheme" parent="AppTheme">
+        <item name="fab_size">mini</item>
+        <item name="fab_showAnimation">@anim/jump_from_down</item>
+        <item name="fab_hideAnimation">@anim/jump_to_down</item>
+        <item name="fab_shadowColor">#444</item>
+        <item name="fab_colorNormal">#43A047</item>
+        <item name="fab_colorPressed">#2E7D32</item>
+        <item name="fab_colorRipple">#1B5E20</item>
+    </style>
+
+    <style name="GreenTheme" parent="AppTheme">
+        <item name="fab_size">mini</item>
+        <item name="fab_showAnimation">@anim/jump_from_down</item>
+        <item name="fab_hideAnimation">@anim/jump_to_down</item>
+        <item name="fab_shadowColor">#444</item>
+        <item name="fab_colorNormal">#43A047</item>
+        <item name="fab_colorPressed">#2E7D32</item>
+        <item name="fab_colorRipple">#1B5E20</item>
+    </style>
+
 </resources>

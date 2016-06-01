@@ -17,6 +17,7 @@ public class Channel implements Serializable,Comparable<Channel> {
     private String channelId;
     private String title;
     private String sortId;
+    private String tagId;
     private Date lastUpdateTime;
     //private Date lastRefreshTime;
     private int unreadCount;
@@ -24,6 +25,7 @@ public class Channel implements Serializable,Comparable<Channel> {
     private String folder;
     private String favIcon;
     private ArrayList<Channel> children;
+    private boolean hasParent;
 
     private Object tag;
 
@@ -115,6 +117,22 @@ public class Channel implements Serializable,Comparable<Channel> {
         this.tag = tag;
     }
 
+    public void setTagId(String tagId) {
+        this.tagId = tagId;
+    }
+
+    public boolean getHasParent() {
+        return hasParent;
+    }
+
+    public void setHasParent(boolean hasParent) {
+        this.hasParent = hasParent;
+    }
+
+    public String getTagId() {
+        return tagId;
+    }
+
     public ArrayList<Channel> getChildren(){
         return children;
     }
@@ -145,12 +163,12 @@ public class Channel implements Serializable,Comparable<Channel> {
         this.tag = new Object();
     }
 
-    public Channel(String id, String title, String sortId, Date lastUpdateTime, Date lastRefreshTime, int unreadCount,
+    public Channel(String id, String title, String sortId, Date lastUpdateTime, String tagId, int unreadCount,
                    boolean isDirectory, String folder, String favIcon, ArrayList<Channel> children, Object tag) {
         this.channelId = id;
         this.title = title;
         this.sortId = sortId;
-        //this.lastRefreshTime = lastRefreshTime;
+        this.tagId = tagId;
         this.lastUpdateTime = lastUpdateTime;
         this.unreadCount = unreadCount;
         this.isDirectory = isDirectory;
@@ -158,6 +176,27 @@ public class Channel implements Serializable,Comparable<Channel> {
         this.folder = folder;
         this.children = children;
         this.tag = tag;
+    }
+
+    public static Channel getStarredChannel(String userId){
+        Channel c = new Channel();
+        c.setChannelId("user/" + userId + "/tag/global.saved");
+
+        return c;
+    }
+
+    public static Channel getAllChannel(){
+        Channel c = new Channel();
+        c.setChannelId("");
+
+        return c;
+    }
+
+    public static Channel getUnreadChannel(){
+        Channel c = new Channel();
+        c.setChannelId("unread");
+
+        return c;
     }
 //
 //	public Channel(Parcel source) {

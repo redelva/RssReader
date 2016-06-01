@@ -1,51 +1,76 @@
 <resources>
-    <string name="app_name">Rss Reader</string>
+    <string name="app_name">Rss阅读器</string>
 
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="drawer_open">打开</string>
+    <string name="drawer_close">关闭</string>
 
-    <string name="drawer_open">Open</string>
-    <string name="drawer_close">Close</string>
+    <string name="navigation_drawer_open">打开抽屉</string>
+    <string name="navigation_drawer_close">关闭抽屉</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="tab_main">首页</string>
+    <string name="tab_all">全部</string>
+    <string name="tab_unread">未读</string>
+    <string name="tab_star">收藏</string>
+    <string name="tab_gallery">图库</string>
 
-    <string name="action_example">Example action</string>
-    <string name="action_sync">Sync</string>
-    <string name="action_search">Search</string>
-    <string name="action_share">Share</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_sync">同步</string>
+    <string name="action_search">搜索</string>
+    <string name="action_share">分享</string>
+    <string name="action_share_to">分享到</string>
+    <string name="action_expand">全屏</string>
+    <string name="action_collapse">取消全屏</string>
+    <string name="action_reload">重新加载</string>
+    <string name="action_settings">设置</string>
+    <string name="action_rename">重命名</string>
+    <string name="action_delete">删除</string>
+    <string name="action_add">添加</string>
 
-    <string name="blog_videooptimize">Video not optimize for mobile device</string>
+    <string name="blog_videooptimize">视频源未对设备优化</string>
     <string name="blog_clicktoview">点击观看</string>
+    <string name="blog_fontmsg">字体请放置到SD卡RssReader目录下Fonts文件夹</string>
+
+    <string name="channel_markComplete">设置成功</string>
+    <string name="channel_markFailed">设置失败</string>
+
+    <string name="empty"></string>
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
 
     <string name="content_errortitle">非常抱歉</string>
     <string name="content_errorcontent">无法获取信息或者错误发生了</string>
     <string name="content_errorload">请点击屏幕重新加载</string>
-    <string name="content_savetolibrary">Saved to library</string>
-    <string name="content_loading">Loading</string>
+    <string name="content_savetolibrary">保存到图库</string>
+    <string name="content_loading">加载</string>
 
     <string name="login_title">登录</string>
     <string name="login_msg">正在加载登陆页面</string>
     <string name="login_authing">正在授权中</string>
 
     <string name="list_empty_view">暂无数据\n下拉重试</string>
+    <string name="list_simple_view">简单视图</string>
+    <string name="list_comple_xview">复杂视图</string>
 
-    <string name="no_data">No data available</string>
-    <string name="title_activity_login">Sign in</string>
+    <string name="no_data">暂无数据</string>
+    <string name="title_activity_login">登录</string>
 
-    <!-- Strings related to login -->
-    <string name="prompt_email">Email</string>
-    <string name="prompt_password">Password (optional)</string>
-    <string name="action_sign_in">Sign in or register</string>
-    <string name="action_sign_in_short">Sign in</string>
-    <string name="error_invalid_email">This email address is invalid</string>
-    <string name="error_invalid_password">This password is too short</string>
-    <string name="error_incorrect_password">This password is incorrect</string>
-    <string name="error_field_required">This field is required</string>
-    <string name="permission_rationale">"Contacts permissions are needed for providing email
-        completions."
-    </string>
-    <string name="title_activity_search">SearchActivity</string>
+    <string name="subscribe_count">订阅数</string>
+    <string name="add_rss_complete">添加订阅成功</string>
+
+    <string name="blog_unread">未读</string>
+    <string name="blog_star">已收藏</string>
+    <string name="blog_read">设置已读</string>
+    <string name="blog_unstar">未收藏</string>
+    <string name="title_activity_subscribe">SubscribeActivity</string>
+
+    <string name="main_exit">再按就要退出啦</string>
+
+    <string name="title_activity_gallery">GalleryActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="loading">Loading…</string>
+
+    <string name="read_setting_font">字号</string>
+    <string name="read_setting_big_font">大</string>
+    <string name="read_setting_small_font">小</string>
 </resources>

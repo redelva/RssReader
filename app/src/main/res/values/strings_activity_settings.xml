@@ -49,6 +49,19 @@
 
     <string name="pref_title_system_sync_settings">System sync settings</string>
 
+    <!-- Example settings for Blog render type -->
+    <string name="pref_header_blog_view">Render &amp; view</string>
+
+    <string name="pref_title_blog_view">Blog render</string>
+    <string-array name="pref_blog_view_titles">
+        <item>Complex</item>
+        <item>Simple</item>
+    </string-array>
+    <string-array name="pref_blog_view_values">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
     <!-- Example settings for Notifications -->
     <string name="pref_header_notifications">Notifications</string>
 

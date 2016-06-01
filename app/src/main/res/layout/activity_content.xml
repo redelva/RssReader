@@ -1,22 +1,21 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/webBackgroundColor"
+    android:id="@+id/rl"
     android:orientation="vertical">
-    <!--Title-->
-    <include layout="@layout/activity_content_title" />
 
-    <RelativeLayout
+    <com.lgq.rssreader.controls.BTViewPager
+        android:id="@+id/contents"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <WebView
-            android:id="@+id/content"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"></WebView>
+    </com.lgq.rssreader.controls.BTViewPager>
 
-        <com.github.clans.fab.FloatingActionMenu
+    <com.github.clans.fab.FloatingActionMenu
         android:id="@+id/menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -25,6 +24,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
+        android:layout_gravity="end|bottom"
         fab:menu_icon="@mipmap/main"
         fab:menu_animationDelayPerItem="0"
         fab:menu_colorNormal="#43A047"
@@ -37,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@mipmap/ic_action_like"
-            fab:fab_label="Like"
+            fab:fab_label="@string/blog_star"
             android:id="@+id/menu_like"
             style="@style/MenuButtonsStyle" />
 
@@ -45,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@mipmap/ic_action_read"
-            fab:fab_label="Read"
+            fab:fab_label="@string/blog_read"
             android:id="@+id/menu_read"
             style="@style/MenuButtonsStyle" />
 
@@ -53,32 +53,43 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@mipmap/ic_action_expand"
-            fab:fab_label="Expand"
+            fab:fab_label="@string/action_expand"
+            android:id="@+id/menu_expand"
             style="@style/MenuButtonsStyle" />
 
         <com.github.clans.fab.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@mipmap/ic_action_reload"
-            fab:fab_label="Reload"
+            fab:fab_label="@string/action_reload"
+            android:id="@+id/menu_reload"
             style="@style/MenuButtonsStyle" />
 
         <com.github.clans.fab.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@mipmap/ic_action_share"
-            fab:fab_label="Share"
+            fab:fab_label="@string/action_share"
+            android:id="@+id/menu_share"
             style="@style/MenuButtonsStyle" />
 
         <com.github.clans.fab.FloatingActionButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@mipmap/ic_action_settings"
-            fab:fab_label="Settings"
+            fab:fab_label="@string/action_settings"
+            android:id="@+id/menu_settings"
             style="@style/MenuButtonsStyle" />
     </com.github.clans.fab.FloatingActionMenu>
 
-        <!--Progress-->
-        <include layout="@layout/process_container" />
-    </RelativeLayout>
-</LinearLayout>
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:behavior_hideable="true"
+        app:layout_behavior="@string/bottom_sheet_behavior"
+        >
+    <include layout="@layout/reading_settings"/>
+    </android.support.v4.widget.NestedScrollView>
+
+</android.support.design.widget.CoordinatorLayout>

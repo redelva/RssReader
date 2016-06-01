@@ -2,6 +2,8 @@ package com.lgq.rssreader.util;
 
 import android.text.TextUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -40,6 +42,38 @@ public class HtmlUtil {
                             "}" +
                             "function moveToTop() {" +
                             "window.scrollTo(0,0);" +
+                            "}" +
+//                            "function scrollFunc(e) {"+
+//                                "if ( typeof scrollFunc.x == 'undefined' ) {"+
+//                                    "scrollFunc.x=window.pageXOffset;"+
+//                                    "scrollFunc.y=window.pageYOffset;"+
+//                                "}"+
+//                                "var diffX=scrollFunc.x-window.pageXOffset;"+
+//                                "var diffY=scrollFunc.y-window.pageYOffset;"+
+//                                "if( diffX<0 ) {"+
+//                                    // Scroll right
+//                                    "window.external.notifyJava('scroll right');"+
+//                                "} else if( diffX>0 ) {"+
+//                                    // Scroll left
+//                                    "window.external.notifyJava('scroll left');"+
+//                                "} else if( diffY<0 ) {"+
+//                                    // Scroll down
+//                                    "window.external.notifyJava('scroll down');"+
+//                                "} else if( diffY>0 ) {"+
+//                                    // Scroll up
+//                                    "window.external.notifyJava('scroll up');"+
+//                                "} else {"+
+//                                    // First scroll event
+//                                "}"+
+//                                "scrollFunc.x=window.pageXOffset;"+
+//                                "scrollFunc.y=window.pageYOffset;"+
+//                            "}"+
+                            "function stopVideo() {" +
+                            "var videos = document.getElementsByTagName('video');"+
+                                "for(var i=0,len=videos.length;i<len;i++){"+
+                            "window.external.notifyJava(i); " +
+                                     "videos[i].pause();" +
+                                "}" +
                             "}" +
                             "function linkHandle() {" +
                             "var e = this.event;" +
@@ -96,7 +130,7 @@ public class HtmlUtil {
                             "}" +
                             "else{" +
                             //Due to the limitation of tudou video should play in same UA, try to use html5 video
-                            "if(result[0].length > 0 && (result[0].indexOf('vr.tudou') != -1 || result[0].indexOf('ku6') != -1)){" +
+                            "if(result[0].length > 0 && (result[0].indexOf('vr.tudou') != -1 || result[0].indexOf('ku6') != -1|| result[0].indexOf('youku') != -1)){" +
                             "var video = document.createElement('video'); " +
                             "video.src= result[0];" +
                             "video.poster= result[1]; " +
@@ -248,7 +282,8 @@ public class HtmlUtil {
                             "}" +
                             "}" +
                             "};" +
-                            "window.onscroll = function () {" +
+                            "window.onscroll = function (e) {" +
+                            //"scrollFunc(e);"+
                             "setTimeout(function () {" +
                             "_init();" +
                             "}, defaults.time);" +
@@ -275,8 +310,20 @@ public class HtmlUtil {
                             "window.scrollTo(0,0);" +
                             "window.external.loadComplete('content'); " +
                             "}" +
+                            "function tapHandler(event) {"+
+                            "if(!tapedTwice) {"+
+                                "tapedTwice = true;"+
+                                "setTimeout( function() { tapedTwice = false; }, 300 );"+
+                                "return false;"+
+                                "}"+
+                                "event.preventDefault();"+
+                                //action on double tap goes below
+                                "window.external.notifyJava('ondblclick'); " +
+                            "}"+
+                            "var tapedTwice = false;"+
                             "var onInit = function () {" +
                             "scrollLoad();" +
+                            "document.getElementById('body').addEventListener('touchstart', tapHandler);"+
                             "window.external.loadComplete('init'); " +
                             //"window.external.notifyJava('init'); " +
                             "};" +
@@ -310,7 +357,16 @@ public class HtmlUtil {
                             "var resetImage = function (img) {" +
                             "img.onclick = function () {" +
                             "var imgSrc = this.src;" +
-                            "window.external.notifyJava('SaveToMediaLibrary'+imgSrc); " +
+                            "var videos = document.getElementsByTagName('video');"+
+                            "var info = 'SaveToMediaLibrary'+imgSrc;"+
+                            "for(var i=0,len=videos.length;i<len;i++){"+
+                                "info = info + '____' +videos[i].src ;"+
+                                "if(videos[i].poster)"+
+                                    "info = info + '____' +videos[i].poster ;"+
+                                "else"+
+                                    "info = info + '____null';"+
+                            "}"+
+                            "window.external.notifyJava(info); " +
                             "if (e && e.preventDefault) " +
                             " e.preventDefault(); " +
                             "else " +
@@ -363,7 +419,8 @@ public class HtmlUtil {
                             "word-break:break-all;" +
                             "}" +
                             "body, menu, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, input, textarea, p, blockquote, th, td { margin: 0; padding: 0; }" +
-                            "body { background: #f3f3f3;" + fontFamily + " }" +
+                            //"body { background: #f3f3f3;" + fontFamily + " }" +
+                            "body { " + fontFamily + " }" +
                             "table { border-collapse: collapse; border-spacing: 0; }" +
                             "fieldset, img { border: 0; }" +
                             "address, caption, cite, code, dfn, em, strong, th, var { font-style: normal; font-weight: normal; }" +
@@ -386,8 +443,8 @@ public class HtmlUtil {
                             ".error a:hover {color: #9caa6d; text-decoration:underline;}" +
                             "</style>" +
                             "</head>" +
-                            "<body id=\"body\" onload='onInit()' style=\"margin:8;font-size:14pt;" +
-                            "color:black;background-color:white;>" +
+                            "<body id=\"body\" onload='onInit()' style=\"margin:8;font-size:" + PreferencesUtil.getAppSettings().getFontSize() + "pt;" +
+                            "color:" + PreferencesUtil.getAppSettings().getStyle().getWebViewFontColor() + ";background-color:" + PreferencesUtil.getAppSettings().getStyle().getWebViewBackgroundColor() + ";>" +
                             "<div id=\"debug\" ></div>" +
                             "<div id=\"content\">" + content + "</div>" +
                             "</div>" +
@@ -398,6 +455,16 @@ public class HtmlUtil {
     }
 
     private final static String regxpForHtml = "<([^>]*)>"; // 过滤所有以<开头以>结尾的标签
+
+//    private final static String IMGXURL_REG = "<img.*xsrc=(.*?)[^>]*?>";
+//
+//    private final static String IMGURL_REG = "<img.*src=(.*?)[^>]*?>";
+//
+//    private final static String VIDEOURL_REG = "<video.*src=(.*?)[^>]*?>";
+//
+//    private final static String HTTPSRC_REG = "(http|https):\"?(.*?)(\"|>|\\s+)";
+
+    private final static String IMG_REGEX = "<img[^>]+(src|xSrc)\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>";
 
     /**
      *
@@ -531,6 +598,97 @@ public class HtmlUtil {
         s=s.replace("&amp;","&");
         return s;
     }
+
+    public static String extraReplace(String img){
+
+        if(img.contains("ugirl.cc")){
+            img = img.replace("-186x140","");
+        }
+
+        if(img.contains("xiuren.org")){
+            img = img.replace("Thum/Thum-","");
+        }
+
+        return img;
+    }
+
+    /***
+     * 获取ImageUrl地址
+     *
+     * @param HTML
+     * @return
+     */
+    public static List<String> getImageList(String HTML) {
+//        Matcher xMatcher = Pattern.compile(IMGXURL_REG).matcher(HTML);
+//        Matcher matcher = Pattern.compile(IMGURL_REG).matcher(HTML);
+//        List<String> listImgUrl = new ArrayList<String>();
+//        while (matcher.find()) {
+//            String img = matcher.group();
+//            img = extraReplace(img);
+//            if(!listImgUrl.contains(img))
+//                listImgUrl.add(img);
+//        }
+//        while (xMatcher.find()) {
+//            String img = xMatcher.group();
+//            img = extraReplace(img);
+//            if(!listImgUrl.contains(img))
+//                listImgUrl.add(img);
+//        }
+
+        //return listImgUrl;
+
+        Matcher matcher = Pattern.compile(IMG_REGEX).matcher(HTML);
+        List<String> listImgUrl = new ArrayList<String>();
+        while (matcher.find()) {
+            String img = matcher.group(2);
+            img = extraReplace(img);
+            if(!listImgUrl.contains(img))
+                listImgUrl.add(img);
+        }
+        return listImgUrl;
+    }
+
+    /***
+     * 获取VideoUrl地址
+     *
+     * @param HTML
+     * @return
+     */
+//    public static List<String> getVideoUrl(String HTML) {
+//        Matcher matcher = Pattern.compile(VIDEOURL_REG).matcher(HTML);
+//        List<String> listImgUrl = new ArrayList<String>();
+//        while (matcher.find()) {
+//            listImgUrl.add(matcher.group());
+//        }
+//        return listImgUrl;
+//    }
+
+    /***
+     * 获取ImageSrc地址
+     *
+     * @param listImageUrl
+     * @return
+     */
+//    public static List<String> getHttpSrc(List<String> listImageUrl) {
+//        List<String> listImgSrc = new ArrayList<String>();
+//        for (String image : listImageUrl) {
+//            Matcher matcher = Pattern.compile(HTTPSRC_REG).matcher(image);
+//            while (matcher.find()) {
+//                String img = matcher.group().substring(0, matcher.group().length() - 1);
+//                if(listImgSrc.indexOf(img) == -1)
+//                    listImgSrc.add(img);
+//            }
+//        }
+//        return listImgSrc;
+//    }
+
+//    public static List<String> getImageList(String content){
+//        List<String> images = HtmlUtil.getImageUrl(content);
+//
+//        images = HtmlUtil.getHttpSrc(images);
+//
+//        return images;
+//    }
 
     /**
      *

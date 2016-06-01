@@ -11,4 +11,7 @@
     <header android:fragment="com.lgq.rssreader.SettingsActivity$DataSyncPreferenceFragment"
         android:title="@string/pref_header_data_sync" />
 
+    <header android:fragment="com.lgq.rssreader.SettingsActivity$RenderViewPreferenceFragment"
+        android:title="@string/pref_header_blog_view" />
+
 </preference-headers>

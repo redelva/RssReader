@@ -26,7 +26,7 @@ public interface RssParser {
 
    List<Channel> loadData() throws InterruptedException;
    boolean markTag(String userId, Blog blog, RssAction action);
-   boolean markTag(Channel displayObj, RssAction action);
+   boolean markTag(String userId, Channel displayObj, RssAction action);
    List<String> sync(String userId, List<SyncState> unsyncs, long lastTimeSyncUnread);
    List<Blog> getRssBlog(Channel channel, Blog blog, int count);
    List<ImageRecord> getFavor(String tag, Blog blog, int count);

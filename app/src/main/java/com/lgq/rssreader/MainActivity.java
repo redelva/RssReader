@@ -3,6 +3,7 @@ package com.lgq.rssreader;
 import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,24 +13,47 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lgq.rssreader.abstraction.FeedlyParser;
 import com.lgq.rssreader.abstraction.RssParser;
 import com.lgq.rssreader.adapter.ViewPagerAdapter;
+import com.lgq.rssreader.core.Constant;
+import com.lgq.rssreader.fragment.BlogListFragment;
+import com.lgq.rssreader.fragment.ChannelListFragment;
+import com.lgq.rssreader.fragment.FavListFragment;
 import com.lgq.rssreader.fragment.FragmentCallback;
-import com.lgq.rssreader.fragment.ListFragment;
+//import com.lgq.rssreader.fragment.ListFragment;
+import com.lgq.rssreader.fragment.SubscribeListFragment;
 import com.lgq.rssreader.fragment.TitleFragment;
+import com.lgq.rssreader.fragment.UnreadListFragment;
+import com.lgq.rssreader.model.Blog;
 import com.lgq.rssreader.model.Channel;
+import com.lgq.rssreader.model.Profile;
+import com.lgq.rssreader.model.RssAction;
+import com.lgq.rssreader.task.ChannelMarkTask;
 import com.lgq.rssreader.util.PreferencesUtil;
+import com.lgq.rssreader.util.ThemeUtil;
+import com.lgq.rssreader.util.VibrateUtil;
+import com.orm.StringUtil;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {// implements FragmentCallback
 
@@ -40,9 +64,12 @@ public class MainActivity extends AppCompatActivity {// implements FragmentCallb
     private ViewPager mViewPager;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
 
+    private static Boolean isExit = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ThemeUtil.onActivityCreateSetTheme(this);
         setContentView(R.layout.activity_main);
         initView();
     }
@@ -103,20 +130,18 @@ public class MainActivity extends AppCompatActivity {// implements FragmentCallb
      */
     private void initMainContent() {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        Fragment homeFragment = new ListFragment();
-        Fragment bestFragment = new TitleFragment();
-        Fragment candidateFragment = new TitleFragment();
+        Fragment homeFragment = new ChannelListFragment();
+        Fragment allFragment = BlogListFragment.newInstance();
+        Fragment unreadFragment = UnreadListFragment.newInstance();
+        Fragment favFragment = FavListFragment.newInstance();
         Fragment recommendFragment = new TitleFragment();
-        adapter.addFragment(homeFragment, "首页");
-        adapter.addFragment(bestFragment, "精华");
-        adapter.addFragment(candidateFragment, "候选");
-        adapter.addFragment(recommendFragment, "推荐");
+        adapter.addFragment(homeFragment, MainActivity.this.getString(R.string.tab_main));
+        adapter.addFragment(allFragment, MainActivity.this.getString(R.string.tab_all));
+        adapter.addFragment(unreadFragment, MainActivity.this.getString(R.string.tab_unread));
+        adapter.addFragment(favFragment, MainActivity.this.getString(R.string.tab_star));
+        adapter.addFragment(recommendFragment, MainActivity.this.getString(R.string.tab_gallery));
         mViewPager.setAdapter(adapter);
         mTabLayout.setupWithViewPager(mViewPager);
-    }
-
-    public void callback(String content){
-
     }
 
     /**
@@ -130,25 +155,52 @@ public class MainActivity extends AppCompatActivity {// implements FragmentCallb
         mDrawerLayout.setDrawerListener(mActionBarDrawerToggle);
     }
 
+    private void exitBy2Click()
+    {
+        Timer tExit = null;
+        if(isExit == false ) {
+            isExit = true;
+            Toast.makeText(this, getResources().getString(R.string.main_exit), Toast.LENGTH_SHORT).show();
+            tExit = new Timer();
+            tExit.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    isExit = false;
+                }
+            }, 2000);
+        }else{
+            finish();
+            //android.os.Process.killProcess(android.os.Process.myPid());
+        }
+    }
+
     /**
      * 初始化按键控制
      */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK ) {
-
-
-            return true;
+            // 监控返回键
+//            new AlertDialog.Builder(MainActivity.this).setTitle("提示")
+//                    .setIconAttribute(android.R.attr.alertDialogIcon)
+//                    .setMessage("确定要退出吗?")
+//                    .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            MainActivity.this.finish();
+//                        }})
+//                    .setNegativeButton("取消", null)
+//                    .create().show();
+            exitBy2Click();
+            return false;
         }else if(keyCode==KeyEvent.KEYCODE_SEARCH){
 
             return true;
         }else if(keyCode==KeyEvent.KEYCODE_MENU){
-
-
+            mDrawerLayout.openDrawer(Gravity.LEFT);
             return true;
-        }else {
-            return super.onKeyDown(keyCode, event);
         }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override
@@ -168,6 +220,18 @@ public class MainActivity extends AppCompatActivity {// implements FragmentCallb
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch(resultCode){
+            case Constant.ADD_SUBSCRIBE:
+                new ChannelTask().execute(PreferencesUtil.getAccessToken());
+                break;
+            case Constant.ThemeChanged:
+                ThemeUtil.changeToTheme(this);
+                break;
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
@@ -183,30 +247,107 @@ public class MainActivity extends AppCompatActivity {// implements FragmentCallb
             new ChannelTask().execute(PreferencesUtil.getAccessToken());
 
             return true;
+        }else if(id == R.id.action_add) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            // Get the layout inflater
+            LayoutInflater inflater = this.getLayoutInflater();
+
+            final View view = inflater.inflate(R.layout.fragment_dialog, null);
+
+            // Inflate and set the layout for the dialog
+            // Pass null as the parent view because its going in the dialog layout
+            builder.setView(view)
+                    .setTitle(R.string.action_add)
+                    // Add action buttons
+                    .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+
+                            CharSequence input = ((TextView)view.findViewById(R.id.input)).getText();
+
+                            if(input != null && input.length() > 0){
+                                Intent i = new Intent(MainActivity.this, SubscribeActivity.class);
+
+                                Bundle b = new Bundle();
+                                b.putCharSequence(SubscribeListFragment.SUBSCRIBE_QUERY, input);
+                                i.putExtras(b);
+
+                                startActivityForResult(i, Constant.ADD_SUBSCRIBE);
+                            }
+
+                            dialog.dismiss();
+                        }
+                    })
+                    .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    });
+            builder.create().show();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
     class ChannelTask extends AsyncTask<String, Void, List<Channel>> {
-        private ListFragment home;
+        private ChannelListFragment home;
 
         public ChannelTask(){
             ViewPagerAdapter adapter = (ViewPagerAdapter)mViewPager.getAdapter();
-            home = (ListFragment)adapter.getItem(0);
+            home = (ChannelListFragment)adapter.getItem(0);
+        }
+
+        private void markAsRead(List<String> ids){
+            String whereClause = "";
+            String[] whereArgs = new String[ids.size()];
+            for(int i = ids.size() - 1; i>=0;i--){
+                whereClause = whereClause + StringUtil.toSQLName("blogID") + "=?";
+                if(i != 0){
+                    whereClause = whereClause + " OR ";
+                }
+                whereArgs[i] = ids.get(i);
+            }
+
+            List<Blog> exists = Blog.find(Blog.class, whereClause, whereArgs);
+            if(exists.size() > 0) {
+                for (Blog b : exists) {
+                    b.setIsRead(true);
+                    Log.i("RssReader", "set " + b.getTitle() + " as read");
+                }
+
+                Blog[] tmp = new Blog[exists.size()];
+                Blog.saveInTx(exists.toArray(tmp));
+            }
         }
 
         protected List<Channel> doInBackground(String... urls) {
 
-            String token = urls[0];
-
-            RssParser parser = new FeedlyParser(token);
+            RssParser parser = new FeedlyParser(urls[0]);
             try {
                 List<Channel> channels = parser.loadData();
 
                 if(channels != null){
                     PreferencesUtil.saveChannels(channels);
                 }
+
+                Profile p = PreferencesUtil.getProfile();
+                long lastSyncTime = PreferencesUtil.getLastSyncTime();
+
+                List<String> ids = parser.sync(p.getId(), null, lastSyncTime);
+
+                if(ids.size() > 100){
+                    for(int i=0;i<ids.size();i = i+100){
+                        if(i + 100 > ids.size())
+                            markAsRead(ids.subList(i, ids.size() - 1));
+                        else
+                            markAsRead(ids.subList(i, i+100));
+                    }
+                }else{
+                    markAsRead(ids);
+                }
+
+                PreferencesUtil.saveLastSyncTime(System.currentTimeMillis());
 
                 return channels;
             }catch (Exception e){
@@ -222,14 +363,16 @@ public class MainActivity extends AppCompatActivity {// implements FragmentCallb
 
         protected void onPostExecute(List<Channel> channels) {
             if(channels != null){
-                if(home != null && channels != null){
-                    home.getChannels().clear();
-                    home.getChannels().addAll(channels);
+                if(home != null && channels != null && home.getChannelRecyclerViewAdapter() != null){
+                    home.getData().clear();
+                    home.getData().addAll(channels);
                     home.getChannelRecyclerViewAdapter().notifyDataSetChanged();
                 }
 
                 if(home != null && home.getSwipeRefreshLayout() != null)
                     home.getSwipeRefreshLayout().setRefreshing(false);
+
+                VibrateUtil.vibrate();
             }else{
                 Toast.makeText(MainActivity.this, "同步数据失败", Toast.LENGTH_SHORT).show();
             }

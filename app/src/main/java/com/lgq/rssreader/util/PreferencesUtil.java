@@ -1,22 +1,44 @@
 package com.lgq.rssreader.util;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.lgq.rssreader.R;
+import com.lgq.rssreader.core.AppSettings;
 import com.lgq.rssreader.core.ReaderApp;
 import com.lgq.rssreader.model.Channel;
 import com.lgq.rssreader.model.Profile;
+import com.lgq.rssreader.model.Style;
+import com.lgq.rssreader.model.serializer.ReadSettingsDeserializer;
+import com.lgq.rssreader.model.serializer.ReadSettingsSerializer;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created by redel on 2015-09-28.
  */
 public class PreferencesUtil {
+    private static HashMap<Style, Integer> style2Theme = new HashMap<Style, Integer>(){{
+        put(Style.Black, R.style.BlackTheme);
+        put(Style.Dark, R.style.DarkTheme);
+        put(Style.Gray, R.style.GrayTheme);
+        put(Style.Green, R.style.GreenTheme);
+        put(Style.White, R.style.WhiteTheme);
+    }};
+
+    private static HashMap<Integer, Style> theme2Style = new HashMap<Integer, Style>(){{
+        put(R.style.BlackTheme, Style.Black);
+        put(R.style.DarkTheme, Style.Dark);
+        put(R.style.GrayTheme, Style.Gray);
+        put(R.style.GreenTheme, Style.Green);
+        put(R.style.WhiteTheme, Style.White);
+    }};
+
     public static void saveChannels(List<Channel> channels){
         Gson gson = new Gson();
 
@@ -45,12 +67,48 @@ public class PreferencesUtil {
         return channels;
     }
 
+    public static int getTheme(){
+        return style2Theme.get(getAppSettings().getStyle());
+    }
+
+    public static Style getStyle(Context context){
+        return theme2Style.get(context.getTheme());
+    }
+
+    public static AppSettings getAppSettings(){
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(AppSettings.class, new ReadSettingsDeserializer());
+        final Gson gson = gsonBuilder.create();
+        if( ReaderApp.getContext().getSharedPreferences("RssReader", 0).contains("AppSettings")){
+            String json = ReaderApp.getContext().getSharedPreferences("RssReader", 0).getString("AppSettings", "");
+            Type type = new TypeToken<AppSettings>(){}.getType();
+            return gson.fromJson(json, type);
+        }
+        return new AppSettings();
+    }
+
+    public static void saveAppSettings(AppSettings readSettings){
+        final GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(AppSettings.class, new ReadSettingsSerializer());
+        final Gson gson = gsonBuilder.create();
+        Type type = new TypeToken<AppSettings>(){}.getType();
+        ReaderApp.getContext().getSharedPreferences("RssReader", 0).edit().putString("AppSettings", gson.toJson(readSettings,type)).commit();
+    }
+
     public static void saveAccessToken(String token){
         ReaderApp.getContext().getSharedPreferences("RssReader", 0).edit().putString("access_token", token).commit();
     }
 
     public static String getAccessToken(){
         return ReaderApp.getContext().getSharedPreferences("RssReader", 0).getString("access_token","");
+    }
+
+    public static void saveLastSyncTime(long lastSyncTime){
+        ReaderApp.getContext().getSharedPreferences("RssReader", 0).edit().putLong("lastSyncTime", lastSyncTime).commit();
+    }
+
+    public static long getLastSyncTime(){
+        return ReaderApp.getContext().getSharedPreferences("RssReader", 0).getLong("lastSyncTime",0);
     }
 
     public static void saveRefreshToken(String token){

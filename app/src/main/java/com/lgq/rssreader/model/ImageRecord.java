@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * Created by redel on 2015-09-12.
  */
-public class ImageRecord  implements Serializable,Comparable<ImageRecord> {
+public class ImageRecord extends SugarRecord<ImageRecord> implements Serializable,Comparable<ImageRecord> {
     private int imageRecordId;
     private String blogId;
     private String originUrl;

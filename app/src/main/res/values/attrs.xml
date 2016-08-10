@@ -16,6 +16,7 @@
         <attr name="selectedTextColor" format="reference" />
         <attr name="readTextColor" format="reference" />
         <attr name="textColor" format="reference" />
+        <attr name="toolbarTextColor" format="reference" />
     </declare-styleable>
 
 </resources>

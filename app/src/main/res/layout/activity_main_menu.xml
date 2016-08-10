@@ -7,4 +7,4 @@
     android:layout_gravity = "start"
     android:clickable="true"
     app:headerLayout = "@layout/activity_main_menu_header"
-    app:menu = "@menu/menu_drawer_view"/>
+    app:menu = "@menu/menu_drawer_view" />

@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -36,6 +38,7 @@ import com.lgq.rssreader.fragment.ChannelListFragment;
 import com.lgq.rssreader.fragment.FavListFragment;
 import com.lgq.rssreader.fragment.FragmentCallback;
 //import com.lgq.rssreader.fragment.ListFragment;
+import com.lgq.rssreader.fragment.GalleryFragment;
 import com.lgq.rssreader.fragment.SubscribeListFragment;
 import com.lgq.rssreader.fragment.TitleFragment;
 import com.lgq.rssreader.fragment.UnreadListFragment;
@@ -63,6 +66,11 @@ public class MainActivity extends AppCompatActivity {// implements FragmentCallb
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
     private ActionBarDrawerToggle mActionBarDrawerToggle;
+    private BottomSheetBehavior behavior;
+
+    public BottomSheetBehavior getBottomSheetBehavior(){
+        return behavior;
+    }
 
     private static Boolean isExit = false;
 
@@ -89,6 +97,13 @@ public class MainActivity extends AppCompatActivity {// implements FragmentCallb
         initMainContent();
         initAction();
         updateChannels();
+        initBehaviour();
+    }
+
+    private void initBehaviour(){
+        CoordinatorLayout coordinatorLayout = (CoordinatorLayout) findViewById(R.id.rl);
+        View bottomSheet = coordinatorLayout.findViewById(R.id.bottom_sheet);
+        behavior = BottomSheetBehavior.from(bottomSheet);
     }
 
     private void updateChannels(){
@@ -134,12 +149,12 @@ public class MainActivity extends AppCompatActivity {// implements FragmentCallb
         Fragment allFragment = BlogListFragment.newInstance();
         Fragment unreadFragment = UnreadListFragment.newInstance();
         Fragment favFragment = FavListFragment.newInstance();
-        Fragment recommendFragment = new TitleFragment();
+        Fragment galleryFragment = new GalleryFragment();
         adapter.addFragment(homeFragment, MainActivity.this.getString(R.string.tab_main));
         adapter.addFragment(allFragment, MainActivity.this.getString(R.string.tab_all));
         adapter.addFragment(unreadFragment, MainActivity.this.getString(R.string.tab_unread));
         adapter.addFragment(favFragment, MainActivity.this.getString(R.string.tab_star));
-        adapter.addFragment(recommendFragment, MainActivity.this.getString(R.string.tab_gallery));
+        adapter.addFragment(galleryFragment, MainActivity.this.getString(R.string.tab_gallery));
         mViewPager.setAdapter(adapter);
         mTabLayout.setupWithViewPager(mViewPager);
     }

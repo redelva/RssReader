@@ -1,5 +1,7 @@
 package com.lgq.rssreader.formatter;
 
+import android.os.Environment;
+
 import com.lgq.rssreader.model.Blog;
 import com.lgq.rssreader.model.ImageRecord;
 import com.lgq.rssreader.readability.Readability;
@@ -17,6 +19,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -27,60 +30,57 @@ public class DownloadDescriptionFormatter extends BlogFormatter {
 
     @Override
     protected String LoadFromCache(Blog blog) {
-        return "";
+        if (blog != null && blog.getDescription().length() == 0) {
+            return "";
+        }
+
+        Document doc = Jsoup.parse(blog.getDescription());
+
+        List<Element> embeds = doc.getElementsByTag("embed");
+
+        for(Element d : doc.getElementsByTag("iframe")){
+            if(d.hasAttr("src")&&
+                    (
+                            d.attr("src").contains("swf") ||
+                                    d.attr("src").contains("youku") ||
+                                    d.attr("src").contains("sohu") ||
+                                    d.attr("src").contains("tudou") ||
+                                    d.attr("src").contains("youtube") ||
+                                    d.attr("src").contains("ku6")
+                    )
+                    )
+                embeds.add(d);
+        }
+
+        for(Element d : doc.getElementsByTag("a")){
+            if(d.hasAttr("href")&&
+                    (
+                            d.attr("href").contains("swf") ||
+                                    d.attr("href").contains("youku") ||
+                                    d.attr("href").contains("sohu") ||
+                                    d.attr("href").contains("tudou") ||
+                                    d.attr("href").contains("youtube") ||
+                                    d.attr("href").contains("ku6")
+                    )
+                    )
+                embeds.add(d);
+        }
+
+        if (embeds.size() != 0)
+            return "";
+
+        for(Element img : doc.getElementsByTag("img")){
+            if(img.hasAttr("src") && !img.attr("src").startsWith(prefix)){
+                return "";
+            }
+        }
+
+        return blog.getDescription();
     }
 
     @Override
     protected String Download(final Blog blog) {
-        downloadContent(blog);
-
-        return "";
-    }
-
-    private String downloadContent(final Blog blog){
-        String content = downloadUrl(blog.getLink(), "utf-8");
-
-        if(content.length() == 0){
-            return "";
-        }
-
-        int index = content.indexOf("body");
-
-        String body = content.substring(0, index) + "<body></body></html>";
-
-        Document doc = Jsoup.parse(body);
-
-        for (int j = 0, length = doc.getElementsByTag("meta").size(); j < length; j++) {
-            Element meta = doc.getElementsByTag("meta").get(j);
-            if (meta.outerHtml().contains("charset")) {
-                String[] pairs = meta.outerHtml().split(" ");
-                for (int i = 0, len = pairs.length; i < len; i++) {
-                    String p = pairs[i].toLowerCase();
-                    if (p.contains("charset") && p.contains("gbk")) {
-                        content = downloadUrl(blog.getLink(), "GBK");
-                        break;
-                    }
-                    if (p.contains("charset") && p.contains("gb2312")) {
-                        content = downloadUrl(blog.getLink(), "gb2312");//CharHelper.change(new String(content.getBytes("utf-8"), "gb2312"), "gb2312", "UTF-8");//new String(content.getBytes("UTF-8"), "gb2312");;
-                        break;
-                    }
-                }
-            }
-        }
-
-        Elements imgs = doc.getElementsByTag("img");
-
-        for (int i = 0, len = imgs.size(); i < len; i++) {
-            //if (imgs.get(i).hasAttr("src") && imgs.get(i).attr("src").startsWith(prefix))
-            if (imgs.get(i).hasAttr("src")){
-                ImageRecord record = ImageUtil.saveImage(blog, imgs.get(i).attr("src"));
-
-                imgs.attr("src", imageData);
-                imgs.attr("xSrc", record.getStoredName());
-            }
-        }
-
-        return HtmlUtil.unescape(doc.outerHtml());
+        return downloadDescription(blog);
     }
 
     private String downloadDescription(final Blog blog){
@@ -90,45 +90,23 @@ public class DownloadDescriptionFormatter extends BlogFormatter {
             return "";
         }
 
-        int index = content.indexOf("body");
-
-        String body = content.substring(0, index) + "<body></body></html>";
-
-        Document doc = Jsoup.parse(body);
-
-        for (int j = 0, length = doc.getElementsByTag("meta").size(); j < length; j++) {
-            Element meta = doc.getElementsByTag("meta").get(j);
-            if (meta.outerHtml().contains("charset")) {
-                String[] pairs = meta.outerHtml().split(" ");
-                for (int i = 0, len = pairs.length; i < len; i++) {
-                    String p = pairs[i].toLowerCase();
-                    if (p.contains("charset") && p.contains("gbk")) {
-                        content = downloadUrl(blog.getLink(), "GBK");
-                        break;
-                    }
-                    if (p.contains("charset") && p.contains("gb2312")) {
-                        content = downloadUrl(blog.getLink(), "gb2312");//CharHelper.change(new String(content.getBytes("utf-8"), "gb2312"), "gb2312", "UTF-8");//new String(content.getBytes("UTF-8"), "gb2312");;
-                        break;
-                    }
-                }
-            }
-        }
-
-        doc = Jsoup.parse(content);
+        Document doc = Jsoup.parse(content);
 
         Elements imgs = doc.getElementsByTag("img");
 
         for (int i = 0, len = imgs.size(); i < len; i++) {
             //if (imgs.get(i).hasAttr("src") && imgs.get(i).attr("src").startsWith(prefix))
-            if (imgs.get(i).hasAttr("src")){
+            if (imgs.get(i).hasAttr("src") && !imgs.get(i).hasAttr("xsrc")){
                 ImageRecord record = ImageUtil.saveImage(blog, imgs.get(i).attr("src"));
 
-                imgs.attr("src", imageData);
-                imgs.attr("xSrc", record.getStoredName());
+                if(record != null){
+                    imgs.get(i).attr("src", imageData);
+                    imgs.get(i).attr("xSrc", "file://" + Environment.getExternalStorageDirectory().getAbsolutePath().toString() + record.getStoredName());
+                }
             }
         }
 
-        return HtmlUtil.unescape(doc.outerHtml());
+        return HtmlUtil.unescape(doc.body().html());
     }
 
     private String downloadUrl(String url, String coding){
@@ -165,6 +143,10 @@ public class DownloadDescriptionFormatter extends BlogFormatter {
     @Override
     protected String GetReadableString(String content) {
         Readability readability = Readability.Create(content);
+
+        if(readability.Content != null && HtmlUtil.trim(HtmlUtil.filterHtml(readability.Content)).replace(" ","").length() == 0){
+            return content;
+        }
 
         return readability.Content;
     }

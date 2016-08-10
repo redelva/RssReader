@@ -835,7 +835,7 @@ public class FeedlyParser implements RssParser {
                 }
 
                 //remove cnbeta ad
-                if (b.getLink().contains("cnbeta.com")) {
+                if (b.getLink()!= null && b.getLink().contains("cnbeta.com")) {
                     int index = b.getDescription().indexOf("<img");
                     if (index != -1)
                         b.setDescription(b.getDescription().substring(0, index));
@@ -869,6 +869,8 @@ public class FeedlyParser implements RssParser {
                 b.setIsRecommend (false);
 
                 blogs.add(b);
+
+                Log.d("RssReader", "Processing at index " + i);
             }
 
             //deal with long time no updates
@@ -947,9 +949,5 @@ public class FeedlyParser implements RssParser {
         }
 
         return results;
-    }
-
-    public void download(Channel c, int count, RssCallback<List<Blog>> handler){
-
     }
 }

@@ -1,18 +1,39 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-    <!--ToolBar-->
-    <include layout="@layout/activity_toolbar" />
-    <!--DrawerLayout-->
-    <android.support.v4.widget.DrawerLayout
-        android:id="@+id/dl_drawer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <!--Main Content-->
-        <include layout="@layout/activity_main_content" />
-        <!--Main Menu-->
-        <include layout="@layout/activity_main_menu" />
-    </android.support.v4.widget.DrawerLayout>
+    android:layout_height="match_parent" >
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="2">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/imageList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".GalleryFragment"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <com.lgq.rssreader.controls.PinchImageView
+    android:id="@+id/currentImage"
+    android:layout_height="fill_parent"
+    android:layout_width="0dp"
+    android:layout_weight="5"
+    android:contentDescription="@string/empty" />
+
+    <!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="fill_parent"-->
+        <!--android:layout_weight="5">-->
+        <!--<com.lgq.rssreader.controls.PinchImageView-->
+            <!--android:id="@+id/currentImage"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"/>-->
+    <!--</RelativeLayout>-->
 
 </LinearLayout>

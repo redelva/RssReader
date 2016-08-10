@@ -610,7 +610,8 @@ public abstract class BlogFormatter
                 String imgUrl = youku.getJSONObject("data").getJSONObject("video").get("logo").toString();
 
                 tip.html(tip.html().substring(0, tip.html().length() - 1) + "____" + imgUrl);
-                FlashComplete.onFlash(youku.getJSONObject("data").getJSONObject("video").getString("title"), new CacheEventArgs(blog, embed, tip, cnt, 0));
+                if(FlashComplete != null)
+                    FlashComplete.onFlash(youku.getJSONObject("data").getJSONObject("video").getString("title"), new CacheEventArgs(blog, embed, tip, cnt, 0));
             }
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -702,7 +703,8 @@ public abstract class BlogFormatter
         else
         {
             tip.html("");
-            FlashComplete.onFlash(ReaderApp.getContext().getResources().getString(R.string.blog_videooptimize), new CacheEventArgs(blog, embed, tip, cnt, -1));
+            if(FlashComplete != null)
+                FlashComplete.onFlash(ReaderApp.getContext().getResources().getString(R.string.blog_videooptimize), new CacheEventArgs(blog, embed, tip, cnt, -1));
         }
     }
 
@@ -712,6 +714,7 @@ public abstract class BlogFormatter
 
         if (index == -1) {
             tip.html("");
+            if(FlashComplete != null)
             FlashComplete.onFlash(ReaderApp.getContext().getResources().getString(R.string.blog_videooptimize), new CacheEventArgs(blog, embed, tip, cnt, -1));
         }
 
@@ -761,7 +764,8 @@ public abstract class BlogFormatter
                         FlashComplete.onFlash("Weiphone", new CacheEventArgs(blog, embed, tip, cnt, 0));
                 }else{
                     tip.html("");
-                    FlashComplete.onFlash(ReaderApp.getContext().getResources().getString(R.string.blog_videooptimize), new CacheEventArgs(blog, embed, tip, cnt, -1));
+                    if(FlashComplete != null)
+                        FlashComplete.onFlash(ReaderApp.getContext().getResources().getString(R.string.blog_videooptimize), new CacheEventArgs(blog, embed, tip, cnt, -1));
                 }
             }
         }.start();
@@ -776,6 +780,7 @@ public abstract class BlogFormatter
 
         if(iid.length() > 0){
             tip.html("http://vr.tudou.com/v2proxy/v2?it=" + iid + "&st=52&pw=____" + coverImg);
+            if(FlashComplete != null)
             FlashComplete.onFlash(title, new CacheEventArgs(blog, embed, tip, cnt, 0));
         }else{
             String content = HttpClient.get(url, new HashMap<String, String>());
@@ -784,6 +789,7 @@ public abstract class BlogFormatter
             coverImg = UrlUtil.findValueInConetent(content, ",", ":", "picUrl");
 
             tip.html("http://vr.tudou.com/v2proxy/v2?it=" + iid + "&st=52&pw=____" + coverImg);
+            if(FlashComplete != null)
             FlashComplete.onFlash(ReaderApp.getContext().getResources().getString(R.string.blog_videooptimize), new CacheEventArgs(blog, embed, tip, cnt, -1));
         }
     }

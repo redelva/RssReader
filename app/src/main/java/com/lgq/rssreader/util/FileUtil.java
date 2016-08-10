@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 import android.os.Environment;
 import android.util.Log;
 
-import com.lgq.rssreader.core.Config;
+import com.lgq.rssreader.core.Constant;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,7 +31,7 @@ public class FileUtil {
             try {
                 File SDFile = android.os.Environment.getExternalStorageDirectory();
 
-                File dir = new File(SDFile.getAbsolutePath() + Config.FONTS_LOCATION);
+                File dir = new File(SDFile.getAbsolutePath() + Constant.FONTS_LOCATION);
 
                 if(dir.exists())
                     return Arrays.asList(dir.listFiles());
@@ -42,5 +42,14 @@ public class FileUtil {
         }
 
         return fonts;
+    }
+
+    public static void makeDir(String dirName){
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            File destDir = new File(dirName);
+            if (!destDir.exists()) {
+                destDir.mkdirs();
+            }
+        }
     }
 }

@@ -40,7 +40,6 @@ public class ReaderApp extends com.orm.SugarApp {
         //this.setTheme(R.style.WhiteTheme);
 
         super.onCreate();
-        this.getTheme().applyStyle(R.style.WhiteTheme, true);
 
         //refWatcher = LeakCanary.install(this);
         //创建默认的ImageLoader配置参数

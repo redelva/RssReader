@@ -1,15 +1,59 @@
 package com.lgq.rssreader.fragment;
 
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Looper;
+import android.os.Message;
+import android.support.annotation.IdRes;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.lgq.rssreader.BlogListActivity;
+import com.lgq.rssreader.R;
+
+import com.lgq.rssreader.abstraction.FeedlyParser;
+import com.lgq.rssreader.abstraction.RssParser;
+import com.lgq.rssreader.adapter.BaseRecyclerViewAdapter;
+import com.lgq.rssreader.adapter.ChannelRecyclerViewAdapter;
+import com.lgq.rssreader.adapter.DialogAdapter;
+import com.lgq.rssreader.adapter.ImageRecyclerViewAdapter;
+import com.lgq.rssreader.adapter.OnRecyclerViewItemClickListener;
+import com.lgq.rssreader.controls.EndlessRecyclerOnScrollListener;
+import com.lgq.rssreader.core.ReaderApp;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
+
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.CoordinatorLayout;
-
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,9 +75,14 @@ import com.lgq.rssreader.abstraction.FeedlyParser;
 import com.lgq.rssreader.abstraction.RssParser;
 import com.lgq.rssreader.adapter.BaseRecyclerViewAdapter;
 import com.lgq.rssreader.adapter.ChannelRecyclerViewAdapter;
+import com.lgq.rssreader.adapter.OnRecyclerViewItemClickListener;
 import com.lgq.rssreader.adapter.OnScrollToListener;
+import com.lgq.rssreader.controls.EndlessRecyclerOnScrollListener;
 import com.lgq.rssreader.core.Constant;
+import com.lgq.rssreader.core.ReaderApp;
+import com.lgq.rssreader.model.Blog;
 import com.lgq.rssreader.model.Channel;
+import com.lgq.rssreader.model.ImageRecord;
 import com.lgq.rssreader.model.RssAction;
 import com.lgq.rssreader.task.ChannelMarkTask;
 import com.lgq.rssreader.task.DownloadTask;
@@ -44,362 +93,127 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
+
 /**
  * Created by redel on 2015-09-03.
  */
-public class GalleryFragment extends BaseListFragment<Channel> {
+public class GalleryFragment extends BaseFragment {
 
-    private static String CHANNELS = "channels";
-    private ChannelRecyclerViewAdapter mAdapter;
-    private List<Channel> mChannels;
+    /**
+     * The fragment's data source of gallery tab
+     */
+    private List<ImageRecord> records = new ArrayList<>();
 
-    private static ExecutorService FULL_TASK_EXECUTOR;
+    /**
+     * The current adapter for list.
+     */
+    private ImageRecyclerViewAdapter mAdapter;
 
-    static {
-        FULL_TASK_EXECUTOR = Executors.newCachedThreadPool();
-    }
+    private int page;
 
-    public static final GalleryFragment newInstance()
-    {
-        GalleryFragment fragment = new GalleryFragment();
-        fragment.setLayout(R.id.channelList);
-        return fragment;
-    }
+    private RecyclerView mRecyclerView;
 
+    private ImageView currentImage;
+
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+
+    private EndlessRecyclerOnScrollListener scrollListener = new EndlessRecyclerOnScrollListener() {
+        @Override
+        public void onBottom() {
+            super.onBottom();
+            mSwipeRefreshLayout.setRefreshing(true);
+            GalleryFragment.this.onLoadMore();
+        }
+    };
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mChannels = PreferencesUtil.getChannels();
-        mAdapter = new ChannelRecyclerViewAdapter(this.getContext(), mChannels, new ChannelRecyclerViewAdapter.ChannelTextViewHolderFactory());
-        mAdapter.setOnScrollToListener(new OnScrollToListener() {
+        View rootView = inflater.inflate(R.layout.fragment_gallery, container, false);
+        currentImage = (ImageView)rootView.findViewById(R.id.currentImage);
+        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.imageList);
+        mAdapter = new ImageRecyclerViewAdapter(getContext(), records, new ImageRecyclerViewAdapter.ImageViewHolderFactory());
+        mSwipeRefreshLayout = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeRefreshLayout);
+        initView();
+        page = 1;
 
-            public void scrollVerticallyToPosition(int position) {
-                RecyclerView.LayoutManager lm = getRecyclerView().getLayoutManager();
+        loadData();
 
-                if (lm != null && lm instanceof LinearLayoutManager) {
-                    ((LinearLayoutManager) lm).scrollToPositionWithOffset(position, 0);
-                } else {
-                    lm.scrollToPosition(position);
-                }
+        return rootView;
+    }
+
+    private void initView(){
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(ReaderApp.getContext()));
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setItemAnimator(new SlideInUpAnimator());
+
+        mAdapter.setOnItemClickListener(new OnRecyclerViewItemClickListener<ImageRecord>() {
+            @Override
+            public void onItemClick(View view, ImageRecord data) {
+                File SDFile = android.os.Environment.getExternalStorageDirectory();
+
+                Bitmap bm = BitmapFactory.decodeFile(SDFile.getAbsolutePath() + data.getStoredName());
+                currentImage.setImageBitmap(bm);
             }
 
             @Override
-            public void scrollTo(int position) {
-                scrollVerticallyToPosition(position - 1);
+            public void onItemLongClick(View view, ImageRecord data) {
+
             }
         });
-        setLayout(R.id.channelList);
-        return super.onCreateView(inflater, container, savedInstanceState);
-    }
 
-    @Override
-    public List<Channel> loadData() {
-        return mChannels;
-    }
-
-    @Override
-    public void onItemClick(View view, Channel data) {
-        Intent intent = new Intent();
-        intent.setClass(getActivity(), BlogListActivity.class);
-        Bundle mBundle = new Bundle();
-        mBundle.putSerializable("channel", data);
-        intent.putExtras(mBundle);
-        startActivityForResult(intent, Constant.BLOG_LIST);
-    }
-
-    @Override
-    public void onItemLongClick(View view, final Channel data) {
-//        DialogPlus dialog = DialogPlus.newDialog(getContext())
-//                .setAdapter(new DialogAdapter(getContext()))
-//                .setContentHolder(new GridHolder(4))
-//                .setGravity(Gravity.BOTTOM)
-//                .setOnItemClickListener(new OnItemClickListener() {
-//                    @Override
-//                    public void onItemClick(DialogPlus dialog, Object item, View view, int position) {
-//                        //Channel channel = (Channel)item;
-//                        switch(position){
-//                            case 0:
-//                                //unSubscribe
-//                                //new FeedlyParser(PreferencesUtil.getAccessToken()).markTag(PreferencesUtil.getProfile().getId(), data, RssAction.UnSubscribe );
-//                                new ChannelMarkTask(data, RssAction.UnSubscribe, ChannelListFragment.this.mAdapter).executeOnExecutor(
-//                                        FULL_TASK_EXECUTOR,
-//                                        PreferencesUtil.getAccessToken(),
-//                                        PreferencesUtil.getProfile().getId());
-//                                break;
-//                            case 1:
-//                                //mark all as read
-//                                new ChannelMarkTask(data, RssAction.AllAsRead, ChannelListFragment.this.mAdapter).executeOnExecutor(
-//                                        FULL_TASK_EXECUTOR,
-//                                        PreferencesUtil.getAccessToken(),
-//                                        PreferencesUtil.getProfile().getId());
-//                                break;
-//                            case 2:
-//                                //download
-//
-//                                break;
-//                            case 3:
-//                                //rename
-//                                break;
-//                        }
-//
-//                        Toast.makeText(ChannelListFragment.this.getContext(), "You had click " + position, Toast.LENGTH_SHORT).show();
-//
-//                        dialog.dismiss();
-//                    }
-//                })
-//                .setCancelable(true)
-//                .setContentHeight(FrameLayout.LayoutParams.WRAP_CONTENT)
-//                .setExpanded(true, FrameLayout.LayoutParams.WRAP_CONTENT)  // This will enable the expand feature, (similar to android L share dialog)
-//                .create();
-//        dialog.show();
-
-//        BottomSheetBehavior behavior = ((MainActivity)getActivity()).getBottomSheetBehavior();
-//
-//        if (behavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
-//            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-//        } else {
-//            behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-//        }
-
-        showBSDialog(data);
-    }
-
-    private void showBSDialog(final Channel channel) {
-        final BottomSheetDialog dialog = new BottomSheetDialog(getContext());
-        dialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.getWindow().getDecorView().setSystemUiVisibility(getActivity().getWindow().getDecorView().getSystemUiVisibility());
-        //Clear the not focusable flag from the window
-        dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-        View contentView = LayoutInflater.from(getContext()).inflate(R.layout.channal_action, null);
-        dialog.setContentView(contentView);
-
-        View parent = (View) contentView.getParent();
-        BottomSheetBehavior behavior = BottomSheetBehavior.from(parent);
-        contentView.measure(0, 0);
-        behavior.setPeekHeight(contentView.getMeasuredHeight());
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) parent.getLayoutParams();
-        params.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
-        parent.setLayoutParams(params);
-
-        View.OnClickListener listener = new View.OnClickListener() {
+        mSwipeRefreshLayout.setColorSchemeResources(R.color.md_green_600);
+        mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light, android.R.color.holo_orange_light, android.R.color.holo_red_light);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onClick(View v) {
-                switch (v.getId()){
-                    case R.id.action_unsubscribe:
-                        dialog.dismiss();
-                        new ChannelMarkTask(channel, RssAction.UnSubscribe, GalleryFragment.this.mAdapter).executeOnExecutor(
-                                        FULL_TASK_EXECUTOR,
-                                        PreferencesUtil.getAccessToken(),
-                                        PreferencesUtil.getProfile().getId());
-                        break;
-                    case R.id.action_mark:
-                        dialog.dismiss();
-                        new ChannelMarkTask(channel, RssAction.AllAsRead, GalleryFragment.this.mAdapter).executeOnExecutor(
-                                        FULL_TASK_EXECUTOR,
-                                        PreferencesUtil.getAccessToken(),
-                                        PreferencesUtil.getProfile().getId());
-                        break;
-                    case R.id.action_download:
-                        dialog.dismiss();
+            public void onRefresh() {
+                //mSwipeRefreshLayout.setRefreshing(true);
 
-                        CheckPermission
-                                .from(getContext())
-                                //.setPackageName(getActivity().getPackageName())
-                                .setPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE})
-                                .setRationaleConfirmText("Request SYSTEM_ALERT_WINDOW")
-                                .setDeniedMsg("The SYSTEM_ALERT_WINDOW Denied")
-                                .setPermissionListener(new PermissionListener() {
-                                    @Override
-                                    public void permissionGranted() {
-                                        new DownloadTask(getContext(), channel).executeOnExecutor(
-                                            FULL_TASK_EXECUTOR,
-                                            PreferencesUtil.getAccessToken(),
-                                            PreferencesUtil.getProfile().getId());
-                                    }
-
-                                    @Override
-                                    public void permissionDenied() {
-                                        Toast.makeText(getContext(), "SYSTEM_ALERT_WINDOW Permission Denied", Toast.LENGTH_SHORT).show();
-                                    }
-                                })
-                                .check();
-                        break;
-                    case R.id.action_move:
-                        if(channel.getIsDirectory()){
-                            Toast.makeText(getContext(), getContext().getString(R.string.action_can_not_move) + channel.getTitle(), Toast.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        dialog.dismiss();
-
-                        final ArrayList<String> choices = new ArrayList<String>();
-                        List<Channel> channels = PreferencesUtil.getChannels();
-                        for(int i= 0; i < channels.size(); i++){
-                            Channel t = channels.get(i);
-                            if(t != null && t.getIsDirectory()){
-                                choices.add(t.getTitle());
-                            }
-                        }
-
-                        Channel parent = PreferencesUtil.findParentChannel(channel);
-                        if(parent != null) {
-                            choices.add(getActivity().getResources().getString(R.string.uncategory));
-                            //else
-                            choices.remove(parent.getTitle());
-                        }
-
-                        boolean[] chsBool = new boolean[choices.size()];
-                        for(int i = 0; i < chsBool.length; i++){
-                            chsBool[i] = false;
-                        }
-                        DialogInterface.OnMultiChoiceClickListener multiClick = new DialogInterface.OnMultiChoiceClickListener(){
-                            @Override
-                            public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                                if(isChecked){
-                                    if(choices.get(which).equals(getActivity().getResources().getString(R.string.uncategory))){
-                                        channel.setTag(Constant.UNCATEGORY);
-                                    }else{
-                                        channel.setTag(choices.get(which));
-                                    }
-                                }
-                            }
-                        };
-                        DialogInterface.OnClickListener onselect = new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                channel.setTag(choices.get(which));
-                            }
-                        };
-
-                        AlertDialog moveDialog = new AlertDialog.Builder(getActivity())
-                                .setIcon(R.mipmap.ic_action_move)
-                                .setTitle(getActivity().getResources().getString(R.string.action_move))
-                                .setMultiChoiceItems((String[]) choices.toArray(new String[0]), chsBool, multiClick)
-                                //.setItems((String[]) choices.toArray(new String[0]), onselect)
-                                .setPositiveButton(getActivity().getResources().getString(R.string.confirm), new DialogInterface.OnClickListener(){
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        new ChannelMarkTask(channel, RssAction.MoveTag, GalleryFragment.this.mAdapter).executeOnExecutor(
-                                                FULL_TASK_EXECUTOR,
-                                                PreferencesUtil.getAccessToken(),
-                                                PreferencesUtil.getProfile().getId());
-
-                                        dialog.dismiss();
-                                    }
-                                })
-                                .setNegativeButton(getActivity().getResources().getString(R.string.cancel),  null).create();
-                        moveDialog.show();
-                        break;
-                    case R.id.action_rename:
-                        dialog.dismiss();
-
-                        final EditText input = new EditText(getActivity());
-                        input.setId(0);
-                        AlertDialog newDialog = new AlertDialog.Builder(getActivity())
-                                .setIcon(R.mipmap.ic_action_rename)
-                                .setView(input)
-                                .setTitle(getActivity().getResources().getString(R.string.action_rename))
-                                .setPositiveButton(getActivity().getResources().getString(R.string.confirm), new DialogInterface.OnClickListener(){
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        String value = input.getText().toString();
-
-                                        channel.setTag(value);
-
-                                        new ChannelMarkTask(channel, RssAction.Rename, GalleryFragment.this.mAdapter).executeOnExecutor(
-                                                FULL_TASK_EXECUTOR,
-                                                PreferencesUtil.getAccessToken(),
-                                                PreferencesUtil.getProfile().getId());
-
-                                        dialog.dismiss();
-                                    }
-                                })
-                                .setNegativeButton(getActivity().getResources().getString(R.string.cancel),  null).create();
-
-                        newDialog.show();
-
-                        break;
-                }
+                //GalleryFragment.this.onRefresh();
             }
-        };
+        });
 
-        for (int index = 0; index < ((ViewGroup)contentView).getChildCount(); index++) {
-            View view = ((ViewGroup)contentView).getChildAt(index);
-            if(view instanceof ViewGroup){
-                for (int j = 0; j < ((ViewGroup)view).getChildCount(); j++) {
-                    View v = ((ViewGroup) view).getChildAt(j);
-                    v.setOnClickListener(listener);
-                }
-            }
-        }
-
-        dialog.show();
+        mRecyclerView.addOnScrollListener(scrollListener);
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        doNext(requestCode, grantResults);
+    public void onLoadMore(){
+        page++;
+        records.addAll(ImageRecord.find(ImageRecord.class, "", new String[]{}, "", "TIME_STAMP DESC", Integer.toString(page * 15)+ ",15"));
+
+        //records.clear();
+        //records.addAll(ImageRecord.find(ImageRecord.class, "", new String[]{}, "", "TIME_STAMP DESC", Integer.toString(page * 15)+ ",15"));
+
+        mSwipeRefreshLayout.setRefreshing(false);
     }
 
-    private void doNext(int requestCode, int[] grantResults) {
-        if (requestCode == Constant.WRITE_EXTERNAL_STORAGE_REQUEST_CODE) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission Granted
-                Toast.makeText(getContext(), "Contact permission is granted", Toast.LENGTH_SHORT).show();
-            } else {
-                // Permission Denied
-                Toast.makeText(getContext(), "Contact permission is not granted", Toast.LENGTH_SHORT).show();
-            }
+    public void loadData(){
+        records.addAll(ImageRecord.find(ImageRecord.class, "", new String[]{}, "", "TIME_STAMP DESC", "0,15"));
+        if(records.size() > 0){
+            File SDFile = android.os.Environment.getExternalStorageDirectory();
+
+            Bitmap bm = BitmapFactory.decodeFile(SDFile.getAbsolutePath() + records.get(0).getStoredName());
+            currentImage.setImageBitmap(bm);
         }
     }
 
-    @Override
-    public void onRefresh() {
-        this.getSwipeRefreshLayout().setRefreshing(true);
-
-        new ChannelTask(this.getSwipeRefreshLayout()).execute(getToken());
-    }
-
-    @Override
-    public void onLoadMore() {
-
-    }
-
-    @Override
-    public BaseRecyclerViewAdapter getAdapter() {
-        return mAdapter;
-    }
-
-    class ChannelTask extends AsyncTask<String, Void, List<Channel>>{
-        private SwipeRefreshLayout mSwipeRefreshLayout;
-
-        public ChannelTask(SwipeRefreshLayout mSwipeRefreshLayout){
-            this.mSwipeRefreshLayout = mSwipeRefreshLayout;
-        }
-
-        protected List<Channel> doInBackground(String... urls) {
-
-            RssParser parser = new FeedlyParser(urls[0]);
-            try {
-                List<Channel> channels = parser.loadData();
-
-                PreferencesUtil.saveChannels(channels);
-
-                return channels;
-            }catch (Exception e){
-                return null;
-            }
-        }
-
-        protected void onPostExecute(List<Channel> channels) {
-            if(channels != null){
-                mChannels.clear();
-                mChannels.addAll(channels);
-                mAdapter.notifyDataSetChanged();
-            }
-
-            mSwipeRefreshLayout.setRefreshing(false);
-        }
-    }
+//    @Override
+//    public boolean onContextItemSelected(android.view.MenuItem item) {
+//
+//        if (bMenu) {
+//            bMenu=false;
+//        }
+//
+//        return super.onContextItemSelected(item);
+//    }
+//
+//    boolean bMenu=true;
+//
+//    @Override
+//    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+//        android.view.MenuInflater inflater = this.getActivity().getMenuInflater();
+//        inflater.inflate(R.menu.contextmenu, (Menu) menu);
+//        super.onCreateContextMenu(menu, v, menuInfo);
+//        bMenu=true;
+//    }
 }

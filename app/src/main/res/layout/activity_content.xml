@@ -89,7 +89,7 @@
         app:behavior_hideable="true"
         app:layout_behavior="@string/bottom_sheet_behavior"
         >
-    <include layout="@layout/reading_settings"/>
+        <include layout="@layout/reading_settings"/>
     </android.support.v4.widget.NestedScrollView>
 
 </android.support.design.widget.CoordinatorLayout>

@@ -63,13 +63,12 @@ public class DescriptionFormatter extends BlogFormatter {
     }
 
     @Override
-    protected String Download(final Blog blog)
-    {
+    protected String Download(final Blog blog) {
         return blog.getDescription();
     }
 
     @Override
     protected String GetReadableString(String content) {
-        return content;
+        return content.replace("figure", "p");
     }
 }

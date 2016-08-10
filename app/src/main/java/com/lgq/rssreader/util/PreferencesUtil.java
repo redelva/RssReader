@@ -51,6 +51,19 @@ public class PreferencesUtil {
         ReaderApp.getContext().getSharedPreferences("RssReader", 0).edit().putString("Channel", sb.toString()).commit();
     }
 
+    public static Channel findParentChannel(Channel channel){
+        if(channel.getTagId() == null)
+            return null;
+
+        for(Channel c : getChannels()){
+            if(c.getChannelId().equals(channel.getTagId())){
+                return c;
+            }
+        }
+
+        return null;
+    }
+
     public static List<Channel> getChannels(){
         Gson gson = new Gson();
         String json = ReaderApp.getContext().getSharedPreferences("RssReader", 0).getString("Channel", "");

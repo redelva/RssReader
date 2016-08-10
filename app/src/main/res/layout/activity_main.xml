@@ -1,18 +1,58 @@
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:orientation="vertical">-->
+    <!--&lt;!&ndash;ToolBar&ndash;&gt;-->
+    <!--<include layout="@layout/activity_toolbar" />-->
+    <!--&lt;!&ndash;DrawerLayout&ndash;&gt;-->
+    <!--<android.support.v4.widget.DrawerLayout-->
+        <!--android:id="@+id/dl_drawer"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent">-->
+        <!--&lt;!&ndash;Main Content&ndash;&gt;-->
+        <!--<include layout="@layout/activity_main_content" />-->
+        <!--&lt;!&ndash;Main Menu&ndash;&gt;-->
+        <!--<include layout="@layout/activity_main_menu" />-->
+    <!--</android.support.v4.widget.DrawerLayout>-->
+
+<!--</LinearLayout>-->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    <!--ToolBar-->
+
     <include layout="@layout/activity_toolbar" />
+
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/webBackgroundColor"
+    android:id="@+id/rl"
+    android:orientation="vertical">
+
     <!--DrawerLayout-->
     <android.support.v4.widget.DrawerLayout
-        android:id="@+id/dl_drawer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <!--Main Content-->
-        <include layout="@layout/activity_main_content" />
-        <!--Main Menu-->
-        <include layout="@layout/activity_main_menu" />
+    android:id="@+id/dl_drawer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <!--Main Content-->
+    <include layout="@layout/activity_main_content" />
+    <!--Main Menu-->
+    <include layout="@layout/activity_main_menu" />
     </android.support.v4.widget.DrawerLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/bottom_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:behavior_hideable="true"
+        app:layout_behavior="@string/bottom_sheet_behavior"
+        >
+        <include layout="@layout/channal_action"/>
+    </android.support.v4.widget.NestedScrollView>
+
+</android.support.design.widget.CoordinatorLayout>
 
 </LinearLayout>

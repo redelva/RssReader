@@ -22,6 +22,11 @@
     <string name="action_reload">重新加载</string>
     <string name="action_settings">设置</string>
     <string name="action_rename">重命名</string>
+    <string name="action_move">移动目录</string>
+    <string name="action_can_not_move">不能移动 </string>
+    <string name="action_unsubscribe">取消订阅</string>
+    <string name="action_download">离线下载</string>
+    <string name="action_mark">设置已读</string>
     <string name="action_delete">删除</string>
     <string name="action_add">添加</string>
 
@@ -55,20 +60,22 @@
 
     <string name="subscribe_count">订阅数</string>
     <string name="add_rss_complete">添加订阅成功</string>
+    <string name="download_complete">离线下载成功</string>
 
     <string name="blog_unread">未读</string>
     <string name="blog_star">已收藏</string>
     <string name="blog_read">设置已读</string>
     <string name="blog_unstar">未收藏</string>
-    <string name="title_activity_subscribe">SubscribeActivity</string>
 
     <string name="main_exit">再按就要退出啦</string>
 
-    <string name="title_activity_gallery">GalleryActivity</string>
+    <string name="title_activity_gallery"></string>
+    <string name="title_activity_subscribe"></string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
 
-    <string name="loading">Loading…</string>
+    <string name="loading">加载…</string>
+    <string name="uncategory">未分类</string>
 
     <string name="read_setting_font">字号</string>
     <string name="read_setting_big_font">大</string>

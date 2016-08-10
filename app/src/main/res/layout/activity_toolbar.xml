@@ -5,12 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
     android:background="?attr/colorPrimary"
-
+    app:theme="@style/AppTheme.Toolbar"
+    app:titleTextColor="?attr/toolbarTextColor"
     tools:showIn="@layout/activity_main"
     tools:toolBarNavMode="tabs"
     />
 
     <!--app:popupTheme="@style/ThemeOverlay.AppCompat.Light"-->
     <!--android:theme="@style/ThemeOverlay.AppCompat.Dark"-->
-
+    <!--app:titleTextColor="?attr/toolbarTextColor"-->
     <!--android:background="@color/md_green_600"-->

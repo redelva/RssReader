@@ -15,6 +15,7 @@ import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -242,8 +243,8 @@ public class ContentFragment extends BaseFragment {
 
     private void initProgressDialog(boolean isShowDialog){
         mProgressDialog = new ProgressDialog(getActivity());
-        //mProgressDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-        //mProgressDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        mProgressDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+        mProgressDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         mProgressDialog.setCanceledOnTouchOutside(false);
         mProgressDialog.setIcon(R.drawable.progress);
         mProgressDialog.setMessage(getResources().getString(R.string.content_loading) + "...");
@@ -253,7 +254,7 @@ public class ContentFragment extends BaseFragment {
         if(isShowDialog)
             mProgressDialog.show();
 
-        //mProgressDialog.getWindow().getDecorView().setSystemUiVisibility(getWindow().getDecorView().getSystemUiVisibility());
+        //mProgressDialog.getWindow().getDecorView().setSystemUiVisibility(getActivity().getWindow().getDecorView().getSystemUiVisibility());
         //Clear the not focusable flag from the window
         //mProgressDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
     }

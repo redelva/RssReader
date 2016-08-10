@@ -76,6 +76,7 @@ public class BlogListActivity extends AppCompatActivity {
 
     private void showPopupMenu(final View view) {
         // Create a PopupMenu, giving it the clicked view for an anchor
+        this.setTheme(R.style.DarkTheme);
         PopupMenu popup = new PopupMenu(this, view);
 
         // Inflate our menu resource into the PopupMenu's Menu

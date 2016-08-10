@@ -99,7 +99,7 @@ public class Readability {
 
     private static Pattern s_unlikelyCandidates = Pattern.compile("combx|comment|community|disqus|extra|foot|header|menu|remark|rss|shoutbox|sidebar|rating_box|sponsor|ad-break|agegate|pagination|pager|popup|tweet|twitter|copyright", Pattern.CASE_INSENSITIVE);
     private static Pattern s_okMaybeItsACandidate = Pattern.compile("and|article|body|column|main|shadow|content|introduction", Pattern.CASE_INSENSITIVE);
-    private static Pattern s_divToPElements = Pattern.compile("<(a|blockquote|dl|div|img|ol|p|pre|table|ul)", Pattern.CASE_INSENSITIVE);
+    private static Pattern s_divToPElements = Pattern.compile("<(a|blockquote|dl|div|img|ol|p|pre|table|ul|figure)", Pattern.CASE_INSENSITIVE);
 
     private static double GetLinkDensity(Element node)
     {
@@ -126,8 +126,7 @@ public class Readability {
         return 0;
     }
 
-    private static int CalculateNodeScore(Element node)
-    {
+    private static int CalculateNodeScore(Element node) {
         int score = 0;
         switch(switchTagStr(node.nodeName()))
         {

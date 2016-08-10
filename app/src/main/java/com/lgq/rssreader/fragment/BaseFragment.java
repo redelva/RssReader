@@ -1,7 +1,6 @@
 package com.lgq.rssreader.fragment;
 
 import android.app.Activity;
-import android.content.Context;
 import android.support.v4.app.Fragment;
 
 import com.lgq.rssreader.core.ReaderApp;

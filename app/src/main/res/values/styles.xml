@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="AppBaseTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Toolbar（actionbar）颜色 -->
@@ -56,19 +56,27 @@
         <item name="selectedTextColor">@color/md_white_1000</item>
         <item name="readTextColor">@color/gray</item>
         <item name="textColor">@android:color/black</item>
+        <item name="toolbarTextColor">@color/white</item>
 
-        <item name="actionMenuTextColor">@android:color/black</item>
-        <item name="android:textColorPrimary">@color/white</item>
-        <item name="android:textColorSecondary">@color/white</item>
+        <item name="actionMenuTextColor">@android:color/white</item>
+        <item name="android:textColorPrimary">@android:color/black</item>
+        <item name="android:textColorSecondary">@android:color/black</item>
 
-        <!-- Toolbar（actionbar）颜色 -->
+        <!-- Toolbar（actionbar）颜色  -->
         <item name="colorPrimary">@color/md_green_600</item>
+
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@color/md_green_600</item>
         <!-- 状态栏颜色 -->
         <item name="colorPrimaryDark">@color/md_green_800</item>
         <!-- 窗口的背景颜色 -->
         <item name="android:windowBackground">@android:color/white</item>
         <!-- SearchView -->
         <item name="searchViewStyle">@style/MySearchViewStyle</item>
+    </style>
+
+    <style name="AppTheme.Toolbar" parent="ThemeOverlay.AppCompat.ActionBar">
+        <!-- Customize color of navigation drawer icon and back arrow -->
+        <item name="colorControlNormal">?attr/toolbarTextColor</item>
     </style>
 
     <style name="BlackTheme" parent="AppBaseTheme">
@@ -107,13 +115,13 @@
         <item name="selectedTextColor">@color/dark_selectedText_color</item>
         <item name="readTextColor">@color/dark_selectedText_color</item>
         <item name="textColor">@color/dark_text_color</item>
+        <item name="toolbarTextColor">@color/dark_text_color</item>
 
-        <item name="actionMenuTextColor">@color/dark_text_color</item>
         <item name="android:textColorPrimary">@color/dark_text_color</item>
         <item name="android:textColorSecondary">@color/dark_text_color</item>
 
-        <!-- Toolbar（actionbar）颜色 -->
-        <item name="colorPrimary">#37474F</item>
+        <!-- Toolbar（actionbar）颜色 37474F -->
+        <item name="colorPrimary">#1E282D</item>
         <!-- 状态栏颜色 -->
         <item name="colorPrimaryDark">#1E282D</item>
         <!-- 窗口的背景颜色 -->
@@ -121,6 +129,11 @@
         <!-- SearchView -->
         <item name="searchViewStyle">@style/MySearchViewStyle</item>
 
+        <item name="android:popupMenuStyle">@style/popupMenuStyle</item>
+    </style>
+
+    <style name="popupMenuStyle" parent="@android:style/Widget.PopupMenu">
+        <item name="android:popupBackground">@android:color/holo_red_light</item>
     </style>
 
     <style name="GrayTheme" parent="AppTheme">

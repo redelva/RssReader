@@ -346,30 +346,39 @@ public class ContentFragment extends BaseFragment {
         }
 
         if(args.startsWith("scroll")){
-            String direction = args.replace("scroll ", "");
+            String infos = args.replace("scroll ", "");
+
+            String direction = infos.split(" ")[0];
+            final double x = Double.parseDouble(infos.split(" ")[1]);
+            final double y = Double.parseDouble(infos.split(" ")[2]);
+
+            Log.d("RssReader", "scroll " + direction + " x=" + x + " y=" + y);
+
             final ContentActivity content = (ContentActivity)getActivity();
-//            switch (direction){
-//                case "up":
-//                    content.runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            if(content.getMenu().isMenuHidden()){
-//                                content.getMenu().showMenu(true);
-//                            }
-//                        }
-//                    });
-//                break;
-//                case "down":
-//                    content.runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            if(!content.getMenu().isMenuHidden()){
-//                                content.getMenu().hideMenu(true);
-//                            }
-//                        }
-//                    });
-//                    break;
-//            }
+            switch (direction){
+                case "up":
+                    content.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(content.getMenu().isMenuHidden()){
+                                content.getMenu().showMenu(false);
+                                if(Math.abs(y) > 50) content.expand();
+                            }
+                        }
+                    });
+                break;
+                case "down":
+                    content.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(!content.getMenu().isMenuHidden()){
+                                content.getMenu().hideMenu(false);
+                                if(Math.abs(y) > 50) content.expand();
+                            }
+                        }
+                    });
+                    break;
+            }
         }
     }
 }

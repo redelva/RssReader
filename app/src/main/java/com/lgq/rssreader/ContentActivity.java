@@ -425,7 +425,7 @@ public class ContentActivity extends AppCompatActivity{
         menuLike.setOnClickListener(clickListener);
     }
 
-    private void expand(){
+    public void expand(){
         // The UI options currently enabled are represented by a bitfield.
         // getSystemUiVisibility() gives us that bitfield. _STICKY
         int uiOptions = getWindow().getDecorView().getSystemUiVisibility();

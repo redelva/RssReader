@@ -43,31 +43,31 @@ public class HtmlUtil {
                             "function moveToTop() {" +
                             "window.scrollTo(0,0);" +
                             "}" +
-//                            "function scrollFunc(e) {"+
-//                                "if ( typeof scrollFunc.x == 'undefined' ) {"+
-//                                    "scrollFunc.x=window.pageXOffset;"+
-//                                    "scrollFunc.y=window.pageYOffset;"+
-//                                "}"+
-//                                "var diffX=scrollFunc.x-window.pageXOffset;"+
-//                                "var diffY=scrollFunc.y-window.pageYOffset;"+
-//                                "if( diffX<0 ) {"+
-//                                    // Scroll right
-//                                    "window.external.notifyJava('scroll right');"+
-//                                "} else if( diffX>0 ) {"+
-//                                    // Scroll left
-//                                    "window.external.notifyJava('scroll left');"+
-//                                "} else if( diffY<0 ) {"+
-//                                    // Scroll down
-//                                    "window.external.notifyJava('scroll down');"+
-//                                "} else if( diffY>0 ) {"+
-//                                    // Scroll up
-//                                    "window.external.notifyJava('scroll up');"+
-//                                "} else {"+
-//                                    // First scroll event
-//                                "}"+
-//                                "scrollFunc.x=window.pageXOffset;"+
-//                                "scrollFunc.y=window.pageYOffset;"+
-//                            "}"+
+                            "function scrollFunc(e) {"+
+                                "if ( typeof scrollFunc.x == 'undefined' ) {"+
+                                    "scrollFunc.x=window.pageXOffset;"+
+                                    "scrollFunc.y=window.pageYOffset;"+
+                                "}"+
+                                "var diffX=scrollFunc.x-window.pageXOffset;"+
+                                "var diffY=scrollFunc.y-window.pageYOffset;"+
+                                "if( diffX<0 ) {"+
+                                    // Scroll right
+                                    "window.external.notifyJava('scroll right ' + diffX + ' ' + diffY);"+
+                                "} else if( diffX>0 ) {"+
+                                    // Scroll left
+                                    "window.external.notifyJava('scroll left ' + diffX + ' ' + diffY);"+
+                                "} else if( diffY<0 ) {"+
+                                    // Scroll down
+                                    "window.external.notifyJava('scroll down ' + diffX + ' ' + diffY);"+
+                                "} else if( diffY>0 ) {"+
+                                    // Scroll up
+                                    "window.external.notifyJava('scroll up ' + diffX + ' ' + diffY);"+
+                                "} else {"+
+                                    // First scroll event
+                                "}"+
+                                "scrollFunc.x=window.pageXOffset;"+
+                                "scrollFunc.y=window.pageYOffset;"+
+                            "}"+
                             "function stopVideo() {" +
                             "var videos = document.getElementsByTagName('video');"+
                                 "for(var i=0,len=videos.length;i<len;i++){"+
@@ -283,7 +283,7 @@ public class HtmlUtil {
                             "}" +
                             "};" +
                             "window.onscroll = function (e) {" +
-                            //"scrollFunc(e);"+
+                            "scrollFunc(e);"+
                             "setTimeout(function () {" +
                             "_init();" +
                             "}, defaults.time);" +

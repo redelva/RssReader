@@ -92,8 +92,7 @@ public class FeedlyParser implements RssParser {
     private List<Channel> getChannels(List<Subscription> subscriptions, List<Tag> tags, List<String> sorts, Unread unread){
         List<Channel> channels = null;
 
-        if (tags != null && unread != null && subscriptions != null && sorts != null)
-        {
+        if (tags != null && unread != null && subscriptions != null && sorts != null) {
             channels = new ArrayList<Channel>();
 
             List<Channel> obj = new ArrayList<Channel>();
@@ -267,7 +266,8 @@ public class FeedlyParser implements RssParser {
                         firstItemMSEC
                 );
 
-                subs.add(s);
+                if(!subs.contains(s))
+                    subs.add(s);
             }
 
             Log.i("RssReader", "Finish Subscriptions");

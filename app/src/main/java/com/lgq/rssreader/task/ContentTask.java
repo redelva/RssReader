@@ -46,7 +46,8 @@ public class ContentTask extends AsyncTask<Blog, Void, String> {
             contentActivity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mProgressDialog.get().show();
+                    if(mProgressDialog.get() != null)
+                        mProgressDialog.get().show();
                 }
             });
         }

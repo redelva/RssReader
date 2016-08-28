@@ -13,8 +13,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
@@ -98,7 +102,7 @@ public class ContentFormatter extends BlogFormatter {
 
             Reader reader = null;
             if ("gzip".equals(conn.getContentEncoding())) {
-                reader = new InputStreamReader(new GZIPInputStream(conn.getInputStream()));
+                reader = new InputStreamReader(new GZIPInputStream(conn.getInputStream()), coding);
             }
             else {
                 reader = new InputStreamReader(conn.getInputStream(), coding);

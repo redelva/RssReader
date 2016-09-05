@@ -364,7 +364,7 @@ public class ContentActivity extends AppCompatActivity{
                         startActivity(Intent.createChooser(intent, ReaderApp.getContext().getString(R.string.action_share_to)));
                         break;
                     case R.id.menu_expand:
-                        expand();
+                        toggle();
                         break;
                     case R.id.menu_reload:
                         int pos = contents.getCurrentItem();
@@ -425,7 +425,7 @@ public class ContentActivity extends AppCompatActivity{
         menuLike.setOnClickListener(clickListener);
     }
 
-    public void expand(){
+    public void toggle(){
         // The UI options currently enabled are represented by a bitfield.
         // getSystemUiVisibility() gives us that bitfield. _STICKY
         int uiOptions = getWindow().getDecorView().getSystemUiVisibility();

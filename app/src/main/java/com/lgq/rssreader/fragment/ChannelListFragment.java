@@ -159,7 +159,7 @@ public class ChannelListFragment extends BaseListFragment<Channel> {
 //                })
 //                .setCancelable(true)
 //                .setContentHeight(FrameLayout.LayoutParams.WRAP_CONTENT)
-//                .setExpanded(true, FrameLayout.LayoutParams.WRAP_CONTENT)  // This will enable the expand feature, (similar to android L share dialog)
+//                .setExpanded(true, FrameLayout.LayoutParams.WRAP_CONTENT)  // This will enable the toggle feature, (similar to android L share dialog)
 //                .create();
 //        dialog.show();
 

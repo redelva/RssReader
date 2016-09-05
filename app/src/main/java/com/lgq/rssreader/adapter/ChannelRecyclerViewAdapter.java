@@ -237,7 +237,7 @@ public class ChannelRecyclerViewAdapter extends BaseRecyclerViewAdapter<Channel,
 
                     @Override
                     public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                        //expand.setRotation((Float) valueAnimator.getAnimatedValue());
+                        //toggle.setRotation((Float) valueAnimator.getAnimatedValue());
                     }
                 });
                 valueAnimator.start();

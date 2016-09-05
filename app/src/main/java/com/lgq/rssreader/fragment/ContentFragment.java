@@ -66,6 +66,9 @@ public class ContentFragment extends BaseFragment {
     private static final int SHARE = 4;
     private static final int SHAKE = 5;
 
+    private double xDistance = 0;
+    private double yDistance = 0;
+
     static {
         FULL_TASK_EXECUTOR = Executors.newCachedThreadPool();
     }
@@ -187,6 +190,9 @@ public class ContentFragment extends BaseFragment {
         mChannel = (Channel)b.getSerializable("channel");
         mFromType = FromType.valueOf(b.getString("from"));
 
+        xDistance = 0;
+        yDistance = 0;
+
         Log.d("RssReader", "rending " + mBlog.getTitle());
     }
 
@@ -264,6 +270,8 @@ public class ContentFragment extends BaseFragment {
         super.onDestroy();
         //mWebview.loadDataWithBaseURL("/", "", "text/html", "utf-8", null);
         mWebview.loadUrl("javascript:stopVideo()");
+        xDistance = 0;
+        yDistance = 0;
     }
 
     @JavascriptInterface
@@ -352,7 +360,10 @@ public class ContentFragment extends BaseFragment {
             final double x = Double.parseDouble(infos.split(" ")[1]);
             final double y = Double.parseDouble(infos.split(" ")[2]);
 
-            Log.d("RssReader", "scroll " + direction + " x=" + x + " y=" + y);
+            xDistance = xDistance + x;
+            yDistance = yDistance + y;
+
+            Log.d("RssReader", "scroll " + direction + " x=" + x + " y=" + y + " xDistance=" + xDistance + " yDistance=" + yDistance);
 
             final ContentActivity content = (ContentActivity)getActivity();
             switch (direction){
@@ -360,9 +371,9 @@ public class ContentFragment extends BaseFragment {
                     content.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(content.getMenu().isMenuHidden()){
+                            if(content.getMenu().isMenuHidden() && Math.abs(y) > 30){
                                 content.getMenu().showMenu(false);
-                                if(Math.abs(y) > 50) content.expand();
+                                content.toggle();
                             }
                         }
                     });
@@ -371,9 +382,9 @@ public class ContentFragment extends BaseFragment {
                     content.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(!content.getMenu().isMenuHidden()){
+                            if(!content.getMenu().isMenuHidden() && Math.abs(y) > 15){
                                 content.getMenu().hideMenu(false);
-                                if(Math.abs(y) > 50) content.expand();
+                                content.toggle();
                             }
                         }
                     });

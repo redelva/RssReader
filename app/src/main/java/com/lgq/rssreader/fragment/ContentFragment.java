@@ -10,9 +10,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.BottomSheetBehavior;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -68,6 +70,19 @@ public class ContentFragment extends BaseFragment {
 
     private double xDistance = 0;
     private double yDistance = 0;
+
+    View.OnTouchListener onTouchListener = new View.OnTouchListener()
+    {
+        @Override
+        public boolean onTouch(View v, MotionEvent event)
+        {
+            ContentActivity activity = (ContentActivity) getActivity();
+            if(activity.getBottomSheet().getState() == BottomSheetBehavior.STATE_EXPANDED)
+                activity.getBottomSheet().setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+            return false;
+        }
+    };
 
     static {
         FULL_TASK_EXECUTOR = Executors.newCachedThreadPool();
@@ -201,7 +216,11 @@ public class ContentFragment extends BaseFragment {
         blogTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mWebview.loadUrl("javascript: moveToTop()");
+                ContentActivity activity = (ContentActivity) getActivity();
+                if(activity.getBottomSheet().getState() == BottomSheetBehavior.STATE_EXPANDED)
+                    activity.getBottomSheet().setState(BottomSheetBehavior.STATE_COLLAPSED);
+                else
+                    mWebview.loadUrl("javascript: moveToTop()");
             }
         });
 
@@ -225,6 +244,10 @@ public class ContentFragment extends BaseFragment {
                 WebView.setWebContentsDebuggingEnabled(true);
             }
         }
+        mWebview.setOnTouchListener(onTouchListener);
+        mWebview.requestFocus(View.FOCUS_DOWN | View.FOCUS_UP);
+        mWebview.getSettings().setLightTouchEnabled(true);
+        mWebview.setFocusable(true);
         mWebview.setWebViewClient(new WebViewClient() {
             // Load opened URL in the application instead of standard browser
             // application
@@ -371,9 +394,13 @@ public class ContentFragment extends BaseFragment {
                     content.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(content.getMenu().isMenuHidden() && Math.abs(y) > 30){
-                                content.getMenu().showMenu(false);
+                            //if(content.getMenu().isMenuHidden() && Math.abs(y) > 30){
+                            if(content.getImmersiveModeEnabled() && Math.abs(y) > 30){
                                 content.toggle();
+                            }
+
+                            if(!content.getImmersiveModeEnabled() && content.getMenu().isMenuHidden()){
+                                content.getMenu().showMenu(false);
                             }
                         }
                     });
@@ -382,9 +409,13 @@ public class ContentFragment extends BaseFragment {
                     content.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(!content.getMenu().isMenuHidden() && Math.abs(y) > 15){
-                                content.getMenu().hideMenu(false);
+                            //if(!content.getMenu().isMenuHidden() && Math.abs(y) > 15){
+                            if(!content.getImmersiveModeEnabled() && Math.abs(y) > 25){
                                 content.toggle();
+                            }
+
+                            if(content.getImmersiveModeEnabled() && !content.getMenu().isMenuHidden()){
+                                content.getMenu().hideMenu(false);
                             }
                         }
                     });

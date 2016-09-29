@@ -1,5 +1,6 @@
 package com.lgq.rssreader;
 
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -86,6 +87,8 @@ public class ContentActivity extends AppCompatActivity{
     public Blog getCurrentBlog(){
         return mBlogs.get(contents.getCurrentItem());
     }
+
+    public BottomSheetBehavior getBottomSheet(){return behavior;}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -335,6 +338,16 @@ public class ContentActivity extends AppCompatActivity{
             }
         });
 
+        bottomSheet.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if(hasFocus){
+                    behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+            }
+        });
+        bottomSheet.setFocusable(true);
+
         if (!mBlog.getIsRead()) {
             menuRead.setLabelText(ReaderApp.getContext().getString(R.string.blog_read));
             menuRead.setImageResource(R.mipmap.ic_action_read);
@@ -425,17 +438,25 @@ public class ContentActivity extends AppCompatActivity{
         menuLike.setOnClickListener(clickListener);
     }
 
+    @TargetApi(18)
+    public boolean getImmersiveModeEnabled(){
+        // The UI options currently enabled are represented by a bitfield.
+        // getSystemUiVisibility() gives us that bitfield. _STICKY
+        int uiOptions = getWindow().getDecorView().getSystemUiVisibility();
+        boolean isImmersiveModeEnabled = ((uiOptions | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY) == uiOptions);
+
+        //boolean isImmersiveModeEnabled = ((uiOptions | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION ) == uiOptions);
+
+        //boolean isImmersiveModeEnabled = ((uiOptions | View.SYSTEM_UI_FLAG_FULLSCREEN ) == uiOptions);
+
+        return isImmersiveModeEnabled;
+    }
+
     public void toggle(){
         // The UI options currently enabled are represented by a bitfield.
         // getSystemUiVisibility() gives us that bitfield. _STICKY
         int uiOptions = getWindow().getDecorView().getSystemUiVisibility();
         int newUiOptions = uiOptions;
-        boolean isImmersiveModeEnabled = ((uiOptions | View.SYSTEM_UI_FLAG_IMMERSIVE) == uiOptions);
-        if (isImmersiveModeEnabled) {
-            Log.i("RssReader", "Turning immersive mode mode off. ");
-        } else {
-            Log.i("RssReader", "Turning immersive mode mode on.");
-        }
 
         // Immersive mode: Backward compatible to KitKat (API 19).
         // Note that this flag doesn't do anything by itself, it only augments the behavior

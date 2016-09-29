@@ -63,15 +63,20 @@ public class BlogListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         ThemeUtil.onActivityCreateSetTheme(this);
         setContentView(R.layout.activity_blogs);
+
+        initData();
+        initView();
+        isInited = true;
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        initData();
-        initView();
-        isInited = true;
+        if(!isInited){
+            initData();
+            mAdapter.notifyDataSetChanged();
+            isInited = true;
+        }
     }
 
     private void showPopupMenu(final View view) {
@@ -117,13 +122,36 @@ public class BlogListActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putInt(LIST_STATE, ((LinearLayoutManager)mRecyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition());
+        isInited = false;
     }
 
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState){
         super.onRestoreInstanceState(savedInstanceState);
         selected_position = savedInstanceState.getInt(LIST_STATE);
-        //mRecyclerView.scrollVerticallyToPosition(selected_position);
+        moveToPosition(selected_position);
+    }
+
+    private void moveToPosition(int n) {
+        LinearLayoutManager mLinearLayoutManager = (LinearLayoutManager)mRecyclerView.getLayoutManager();
+        //先从RecyclerView的LayoutManager中获取第一项和最后一项的Position
+        int firstItem = mLinearLayoutManager.findFirstVisibleItemPosition();
+        int lastItem = mLinearLayoutManager.findLastVisibleItemPosition();
+        //然后区分情况
+        if (n <= firstItem ){
+            //当要置顶的项在当前显示的第一个项的前面时
+            mRecyclerView.scrollToPosition(n);
+        }else if ( n <= lastItem ){
+            //当要置顶的项已经在屏幕上显示时
+            int top = mRecyclerView.getChildAt(n - firstItem).getTop();
+            mRecyclerView.scrollBy(0, top);
+        }else{
+            //当要置顶的项在当前显示的最后一项的后面时
+            mRecyclerView.scrollToPosition(n);
+            //这里这个变量是用在RecyclerView滚动监听里面的
+            //move = true;
+        }
+
     }
 
     private void initData(){

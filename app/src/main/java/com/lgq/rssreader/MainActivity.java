@@ -5,6 +5,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetBehavior;
@@ -26,6 +27,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +52,8 @@ import com.lgq.rssreader.task.ChannelMarkTask;
 import com.lgq.rssreader.util.PreferencesUtil;
 import com.lgq.rssreader.util.ThemeUtil;
 import com.lgq.rssreader.util.VibrateUtil;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.orm.StringUtil;
 
 import java.util.ArrayList;
@@ -94,10 +98,30 @@ public class MainActivity extends AppCompatActivity {// implements FragmentCallb
         mViewPager = (ViewPager) findViewById(R.id.vp_main_content);
         //设置对应属性
         initToolBar();
+        initNavigationView();
         initMainContent();
         initAction();
         updateChannels();
         initBehaviour();
+    }
+
+    private void initNavigationView(){
+        View headerView = mNavigationView.getHeaderView(0);
+
+        TextView name = (TextView)headerView.findViewById(R.id.name);
+        ImageView avatar = (ImageView)headerView.findViewById(R.id.avatar);
+
+        Profile p = PreferencesUtil.getProfile();
+        name.setText(p.getFamilyName() + p.getGivenName() + "@" + p.getAccount());
+
+        //显示图片的配置
+        DisplayImageOptions options = new DisplayImageOptions.Builder()
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .build();
+
+        ImageLoader.getInstance().displayImage(p.getPicture(), avatar, options);
     }
 
     private void initBehaviour(){
@@ -314,6 +338,10 @@ public class MainActivity extends AppCompatActivity {// implements FragmentCallb
         }
 
         private void markAsRead(List<String> ids){
+            if(ids.size() == 0){
+                return;
+            }
+
             String whereClause = "";
             String[] whereArgs = new String[ids.size()];
             for(int i = ids.size() - 1; i>=0;i--){
@@ -339,8 +367,9 @@ public class MainActivity extends AppCompatActivity {// implements FragmentCallb
         protected List<Channel> doInBackground(String... urls) {
 
             RssParser parser = new FeedlyParser(urls[0]);
+            List<Channel> channels = new ArrayList<>();
             try {
-                List<Channel> channels = parser.loadData();
+                channels = parser.loadData();
 
                 if(channels != null){
                     PreferencesUtil.saveChannels(channels);
@@ -364,10 +393,11 @@ public class MainActivity extends AppCompatActivity {// implements FragmentCallb
 
                 PreferencesUtil.saveLastSyncTime(System.currentTimeMillis());
 
-                return channels;
             }catch (Exception e){
-                return null;
+                Log.e("RssReader", e.getMessage(), e);
             }
+
+            return channels;
         }
 
         @Override
@@ -387,7 +417,9 @@ public class MainActivity extends AppCompatActivity {// implements FragmentCallb
                 if(home != null && home.getSwipeRefreshLayout() != null)
                     home.getSwipeRefreshLayout().setRefreshing(false);
 
-                VibrateUtil.vibrate();
+                //VibrateUtil.vibrate();
+
+                Toast.makeText(MainActivity.this, "完成数据同步", Toast.LENGTH_SHORT).show();
             }else{
                 Toast.makeText(MainActivity.this, "同步数据失败", Toast.LENGTH_SHORT).show();
             }

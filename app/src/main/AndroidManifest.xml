@@ -10,6 +10,7 @@
     <application
         android:name=".core.ReaderApp"
         android:allowBackup="true"
+
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/WhiteTheme"
@@ -38,6 +39,7 @@
         </activity>
         <activity
             android:name=".MainActivity"
+            android:launchMode="singleTop"
             android:label="@string/app_name">
             <meta-data
                 android:name="android.app.searchable"
@@ -45,12 +47,15 @@
         </activity>
         <activity
             android:name=".BlogListActivity"
+            android:launchMode="singleTop"
             android:label="" />
         <activity
             android:name=".ContentActivity"
+            android:launchMode="singleTop"
             android:label="" />
         <activity
             android:name=".SettingsActivity"
+            android:launchMode="singleTop"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".MainActivity">
             <meta-data
@@ -59,6 +64,7 @@
         </activity>
         <activity
             android:name=".LoginActivity"
+            android:launchMode="singleTop"
             android:label="@string/title_activity_login" />
         <activity android:name="com.lgq.rssreader.controls.scrollgalleryview.VideoPlayerActivity" />
         <activity
@@ -83,9 +89,11 @@
 
         <activity
             android:name=".SubscribeActivity"
+            android:launchMode="singleTop"
             android:label="@string/title_activity_subscribe" />
         <activity
             android:name=".GalleryActivity"
+            android:launchMode="singleTop"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_gallery"
             android:theme="@style/FullscreenTheme"></activity>
